@@ -1,0 +1,15 @@
+"From","To","Length","Capacity","Cost"
+"SaoPaulo","Brasilia",880.523285268175,50,1
+"PortoAlegre","Florianopolis",412.816669303066,50,1
+"Florianopolis","Curitiba",239.290744722797,50,1
+"Curitiba","SaoPaulo",296.887622466876,50,1
+"Brasilia","PortoAlegre",1641.32357559243,50,1
+"SaoPaulo","RioDeJaneiro",361.207594090418,50,1
+"RioDeJaneiro","BeloHorizonte",294.799021985305,50,1
+"BeloHorizonte","Brasilia",612.014589955996,50,1
+"BeloHorizonte","Fortaleza",1884.52283510062,50,1
+"Fortaleza","Recife",553.749779546394,50,1
+"Recife","Salvador",575.687851060827,50,1
+"Salvador","RioDeJaneiro",1219.84836943232,50,1
+
+

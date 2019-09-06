@@ -1,0 +1,174 @@
+"From","To","Length","Capacity","Cost"
+"Amarilho","Albuquerque",458,5,297700
+"Denver","Albuquerque",667,2,433550
+"New York","Allentown",137,2,89050
+"Scranton","Allentown",113,5,73450
+"Stamford","Allentown",192,6,124800
+"Birminghan","Atlanta",234,9,152100
+"Macon","Atlanta",130,7,84500
+"Atlanta","Augusta",234,3,152100
+"Modesto","Bakersfield",324,3,210600
+"San Diego","Bakersfield",369,4,239850
+"San Jose","Bakersfield",387,1,251550
+"Spokane","Billings",865,6,562250
+"Allentown","Binghamton",204,2,132600
+"Scranton","Binghamton",93,9,60450
+"Syracuse","Binghamton",207,3,134550
+"Jackson","Birminghan",377,4,245050
+"Portland","Boise",688,3,447200
+"Spokane","Boise",664,2,431600
+"Manchester","Boston",83,2,53950
+"Stamford","Bridgeport",35,5,22750
+"Cleveland","Buffalo",300,13,195000
+"Syracuse","Buffalo",235,12,152750
+"Cincinnati","Charleston",331,4,215150
+"Columbus","Charleston",257,4,167050
+"Pittsburgh","Charleston",352,5,228800
+"wytheville","Charleston",204,5,132600
+"Atlanta","Charlotte",386,4,250900
+"Atlanta","chattanooga",187,4,121550
+"Milwaukee","Chicago",138,7,89700
+"Peoria","Chicago",245,7,159250
+"Knoxville","Cincinnati",403,4,261950
+"Louisville","Cincinnati",159,7,103350
+"Miami","clearwater",438,2,284700
+"Columbus","Cleveland",220,14,143000
+"Pittsburgh","Cleveland",204,11,132600
+"Toledo","Cleveland",175,10,113750
+"Augusta","Columbia",109,2,70850
+"Cincinnati","Columbus",168,4,109200
+"Indianapolis","Columbus",273,15,177450
+"Toledo","Columbus",211,3,137150
+"Houston","Dallas",383,6,248950
+"Oklahoma city","Dallas",328,4,213200
+"Waco","Dallas",150,3,97500
+"Amarilho","Denver",676,3,439400
+"Salt lake city","Denver",797,12,518050
+"Kansas city","Des Moines",305,3,198250
+"Minneapolis","Des Moines",390,3,253500
+"Peoria","Des Moines",404,6,262600
+"Grand rapids","Detroit",237,2,154050
+"Albuquerque","El Paso",425,2,276250
+"lubbock","El Paso",551,9,358150
+"Billings","Fargo",974,6,633100
+"Minneapolis","Fargo",369,6,239850
+"Billings","Fort Collins",798,3,518700
+"Denver","Fort Collins",99,3,64350
+"Charlotte","Greensboro",143,5,92950
+"Raleigh","Greensboro",119,3,77350
+"wytheville","Greensboro",174,5,113100
+"Bridgeport","Hartford",83,4,53950
+"chicopee","Hartford",47,4,30550
+"Lake Katrina","Hartford",139,7,90350
+"San Antonio","Houston",312,2,202800
+"South bend","Indianapolis",221,3,143650
+"St Louis","Indianapolis",386,17,250900
+"Memphis","Jackson",334,3,217100
+"New orleans","Jackson",298,3,193700
+"Gainesville","Jacksonville",109,2,70850
+"Orlando","Jacksonville",217,3,141050
+"Jacksonville","Jupiter",423,4,274950
+"Miami","Jupiter",140,3,91000
+"Oklahoma city","Kansas city",560,2,364000
+"St Louis","Kansas city",397,13,258050
+"Wichita","Kansas city",313,8,203450
+"Charlotte","Knoxville",358,2,232700
+"chattanooga","Knoxville",175,4,113750
+"Nashville","Knoxville",287,4,186550
+"Binghamton","Lake Katrina",209,8,135850
+"Schenectady","Lake Katrina",103,4,66950
+"Stamford","Lake Katrina",132,2,85800
+"Salt lake city","Las vegas",671,3,436150
+"San Diego","Las vegas",532,2,345800
+"Oklahoma city","Little rock",539,2,350350
+"shreveport","Little rock",332,2,215800
+"San Jose","Los Angelos",545,3,354250
+"Indianapolis","Louisville",180,3,117000
+"Nashville","Louisville",279,8,181350
+"Amarilho","lubbock",190,7,123500
+"Dallas","lubbock",518,7,336700
+"Augusta","Macon",195,1,126750
+"Waycross","Macon",251,6,163150
+"Worcester","Manchester",95,2,61750
+"Little rock","Memphis",217,3,141050
+"Nashville","Memphis",333,4,216450
+"St Louis","Memphis",454,3,295100
+"Minneapolis","Milwaukee",540,7,351000
+"Atlanta","Montgomery",257,2,167050
+"Birminghan","Montgomery",145,2,94250
+"Mobile","Montgomery",270,2,175500
+"Birminghan","Nashville",306,8,198900
+"St Louis","Nashville",492,9,319800
+"Houston","New orleans",558,6,362700
+"Mobile","New orleans",229,7,148850
+"Amarilho","Oklahoma city",412,9,267800
+"Denver","Omaha",863,6,560950
+"Des Moines","Omaha",210,6,136500
+"Kansas city","Omaha",294,4,191100
+"clearwater","Orlando",169,3,109850
+"Gainesville","Orlando",177,3,115050
+"Jupiter","Orlando",243,2,157950
+"Springfield","Peoria",110,2,71500
+"Allentown","Philadelphia",82,7,53300
+"Washington","Philadelphia",214,8,139100
+"Washington","Pittsburgh",381,2,247650
+"Eugene","Portland",175,2,113750
+"Seattle","Portland",280,3,182000
+"Boston","Providence",70,4,45500
+"Hartford","Providence",112,5,72800
+"Worcester","Providence",62,2,40300
+"Columbia","Raleigh",347,2,225550
+"Richmond","Raleigh",244,6,158600
+"Savannah","Raleigh",514,5,334100
+"Washington","Richmond",170,5,110500
+"Schenectady","Rutland",140,7,91000
+"Eugene","Sacramento",758,2,492700
+"Modesto","Sacramento",119,3,77350
+"Salt lake city","Sacramento",1043,8,677950
+"Boise","Salt lake city",543,5,352950
+"lubbock","San Antonio",652,2,423800
+"Los Angelos","San Diego",193,4,125450
+"Tucson","San Diego",654,7,425100
+"Sacramento","San Francisco",138,4,89700
+"Modesto","San Jose",120,1,78000
+"San Francisco","San Jose",74,3,48100
+"Augusta","Savannah",200,2,130000
+"Jacksonville","Savannah",219,4,142350
+"Waycross","Savannah",166,2,107900
+"Syracuse","Schenectady",195,10,126750
+"Pittsburgh","Scranton",446,13,289900
+"Spokane","Seattle",449,4,291850
+"Dallas","shreveport",300,5,195000
+"Jackson","shreveport",347,4,225550
+"Fargo","Sioux Falls",389,3,252850
+"Omaha","Sioux Falls",291,4,189150
+"Chicago","South bend",140,12,91000
+"Grand rapids","South bend",173,3,112450
+"Oklahoma city","St Louis",800,10,520000
+"Springfield","St Louis",157,3,102050
+"New York","Stamford",59,2,38350
+"Gainesville","tallahassee",230,4,149500
+"Jacksonville","tallahassee",263,1,170950
+"Mobile","tallahassee",389,7,252850
+"Albuquerque","Tempe",706,4,458900
+"Las vegas","Tempe",472,3,306800
+"Tucson","Tempe",174,2,113100
+"Detroit","Toledo",90,3,58500
+"South bend","Toledo",234,11,152100
+"El Paso","Tucson",508,9,330200
+"San Antonio","Waco",290,2,188500
+"Jacksonville","Waycross",124,5,80600
+"tallahassee","Waycross",212,3,137800
+"Boston","Westbrook",166,2,107900
+"Manchester","Westbrook",139,1,90350
+"Denver","Wichita",818,8,531700
+"Oklahoma city","Wichita",259,2,168350
+"Boston","Worcester",64,2,41600
+"chicopee","Worcester",80,3,52000
+"Rutland","Worcester",206,5,133900
+"Cincinnati","wytheville",541,2,351650
+"Richmond","wytheville",386,2,250900
+"Washington","wytheville",473,4,307450
+"Rutland","Westbrook",209.731099442758,2,1
+
+
