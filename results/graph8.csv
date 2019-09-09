@@ -1,0 +1,13 @@
+PortoAlegre,Florianopolis,{'Length': 412.816669303066, 'Capacity': 50, 'Cost': 1}
+PortoAlegre,Brasilia,{'Length': 1641.3235755924302, 'Capacity': 50, 'Cost': 1}
+Florianopolis,Curitiba,{'Length': 239.290744722797, 'Capacity': 50, 'Cost': 1}
+SaoPaulo,Brasilia,{'Length': 880.5232852681751, 'Capacity': 50, 'Cost': 1}
+SaoPaulo,Curitiba,{'Length': 296.887622466876, 'Capacity': 50, 'Cost': 1}
+SaoPaulo,RioDeJaneiro,{'Length': 361.207594090418, 'Capacity': 50, 'Cost': 1}
+SaoPaulo,Salvador,{'Length': 1496.6562272189967, 'capacity': 50, 'cost': 1}
+RioDeJaneiro,BeloHorizonte,{'Length': 294.799021985305, 'Capacity': 50, 'Cost': 1}
+RioDeJaneiro,Salvador,{'Length': 1219.84836943232, 'Capacity': 50, 'Cost': 1}
+Salvador,Recife,{'Length': 575.687851060827, 'Capacity': 50, 'Cost': 1}
+BeloHorizonte,Brasilia,{'Length': 612.014589955996, 'Capacity': 50, 'Cost': 1}
+BeloHorizonte,Fortaleza,{'Length': 1884.52283510062, 'Capacity': 50, 'Cost': 1}
+Recife,Fortaleza,{'Length': 553.7497795463939, 'Capacity': 50, 'Cost': 1}
