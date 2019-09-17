@@ -57,7 +57,7 @@ class GeoNetwork(nx.Graph):
                 labels[link] = str(round(labels[link])) + ' Km'
             nx.draw_networkx_edge_labels(self, coord, edge_labels=labels, font_size=2, bbox={'alpha': 0})
         # Saving figure
-        plt.savefig('results/' + folder + 'graph.png', format='png', dpi=600)
+        plt.savefig('results/' + folder + 'network.png', format='png', dpi=600)
         # Clearing figure buffer
         plt.cla()
         plt.cla()
@@ -81,7 +81,7 @@ class GeoNetwork(nx.Graph):
         return report
     
     def showReport(self, report=None, weight=None):
-        print('Graph report\n')
+        print('Network report\n')
         if type(report) is not dict:
             report = self.report(weight)
         for key, value in report.items():
@@ -92,7 +92,7 @@ class GeoNetwork(nx.Graph):
             report = self.report(weight)
         report['degree'] = list(report['degree'])
         report_json = json.dumps(report)
-        f = open('results/' + folder + "graph_reports.json","w")
+        f = open('results/' + folder + "network_reports.json","w")
         f.write(report_json)
         f.close()
         
@@ -112,18 +112,17 @@ class GeoNetwork(nx.Graph):
             I.add_edge(edge[0], edge[1], **{self.distance: distance, **attributes})
             # Saving to file
             I_df = nx.convert_matrix.to_pandas_edgelist(I, source=self.link_source, target=self.link_target)
-            folder = 'graph%i/' % i
+            folder = 'network%i/' % i
             path = 'results/' + folder
             try:
                 os.mkdir(path)
             except:
                 pass
             try:
-                I_df.to_csv(path + 'graph_links.csv', index=False)
+                I_df.to_csv(path + 'network_links.csv', index=False)
                 if save_report:
                     I.saveReport(folder=folder, weight=self.distance)
                 if save_figure:
                     I.saveFigure(folder=folder, weight_label=self.distance)
             except Exception as e:
-                print(e)
-                print('Error saving graph%i reports!' % i)
+                print('Error saving network%i reports!' % i)
