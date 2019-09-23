@@ -1,7 +1,6 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import networkx as nx
-from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 from haversine import haversine
 from copy import deepcopy
 import os
@@ -34,34 +33,25 @@ class GeoNetwork(nx.Graph):
                 self.add_edge(link[self.link_source], link[self.link_target], **attributes)
 
     def saveFigure(self, folder='', weight_label=None):
-        # Drawing map
+        # Clearing figure buffer
+        plt.cla()
+        plt.close()
+        # Drawing nodes
         lats = list(nx.get_node_attributes(self, self.lat).values())
         lons = list(nx.get_node_attributes(self, self.lon).values())
-        gap = 5
-        m = Basemap(projection='merc', resolution='i', llcrnrlat=min(lats)-gap, llcrnrlon=min(lons)-gap, urcrnrlat=max(lats)+gap, urcrnrlon=max(lons)+gap)
-        m.drawcountries(linewidth = 0.5)
-        m.fillcontinents(color='black', lake_color='white', alpha=.15)
-        m.drawcoastlines(linewidth=0.5)
-        m.drawstates(linewidth = 0.25)
-        # Drawing nodes
-        lats, lons = m(lons, lats)
         coord = {}
         nodes = list(self.nodes())
         for i in range(len(self.nodes())):
             coord[nodes[i]] = (lats[i], lons[i])
-        nx.draw(self, coord, with_labels=True, node_size=50, font_size=4, edge_color='lightblue') 
+        nx.draw(self, coord, with_labels=True, node_size=150, font_size=6, edge_color='lightblue') 
         # Drawing links labels
         if type(weight_label) is str:
             labels = nx.get_edge_attributes(self, weight_label)
             for link in labels.keys():
                 labels[link] = str(round(labels[link])) + ' Km'
-            nx.draw_networkx_edge_labels(self, coord, edge_labels=labels, font_size=2, bbox={'alpha': 0})
+            nx.draw_networkx_edge_labels(self, coord, edge_labels=labels, font_size=4)
         # Saving figure
-        plt.savefig('results/' + folder + 'network.png', format='png', dpi=600)
-        # Clearing figure buffer
-        plt.cla()
-        plt.cla()
-        plt.close()
+        plt.savefig('results/' + folder + 'network.png', format='png', dpi=400)
 
     def report(self, weight=None):
         report = {
