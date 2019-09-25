@@ -8,7 +8,7 @@ pip3 install haversine
 ```
 ## Creating network
 ### Manually
-```
+```python
 import EONS
 
 eon = EONS.EON()
@@ -21,7 +21,7 @@ eon.add_node('Lyon', 45.7484, 4.8467, 'EOCC')
 eon.add_link('Paris', 'Lyon', 465.6, 100, 329.90)
 ```
 ### Reading csv
-```
+```python
 import EONS
 
 nodes_csv = 'networks/rnp/rnpBrazil_nodes.csv'
@@ -32,7 +32,7 @@ eon.load_csv(nodes_csv, links_csv)
 ```
 
 ## Getting reports
-```
+```python
 eon.print_reports()
 eon.save_reports()
 # or
@@ -42,7 +42,7 @@ eon.save_reports(reports)
 ```
 
 ## Creating figures
-```
+```python
 eon.show_figure()
 # or
 eon.save_figure()
