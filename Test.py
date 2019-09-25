@@ -1,16 +1,15 @@
-from GeoNetwork import GeoNetwork
+import EONS
 
-rnp_nodes = 'networks/rnp/rnpBrazil_nodes.csv'
-rnp_links = 'networks/rnp/rnpBrazil_links.csv'
+nodes_csv = 'networks/rnp/rnpBrazil_nodes.csv'
+links_csv = 'networks/rnp/rnpBrazil_links.csv'
 
-usa_nodes = 'networks/usa/usaGde_nodes.csv'
-usa_links = 'networks/usa/usaGde_links.csv'
+eon = EONS.EON()
+eon.load_csv(nodes_csv, links_csv)
 
-net = GeoNetwork(rnp_nodes, rnp_links, lat='Lat', lon='Long', distance='Length')
+reports = eon.reports()
+eon.print_reports(reports)
+eon.save_reports(reports)
 
-report = net.report('Length')
-net.showReport(report)
-net.saveReport(report=report)
-net.saveFigure(weight_label='Length')
+eon.save_figure()
 
-net.addLinkByDistance(max_distance=(report['diameter_by_Length'] / 2), attributes={'Capacity': 50, 'Cost': 1}, save_figure=True)
+eon.add_link_by_length(50, 1, reports['diameter_by_length'] / 2, save_figure=True)
