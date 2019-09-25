@@ -18,7 +18,7 @@ class EON(nx.Graph):
     
     def load_csv(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 
-                link_from='from', link_to='fo', link_length='length', link_capacity='capacity', link_cost='cost'):
+                link_from='from', link_to='to', link_length='length', link_capacity='capacity', link_cost='cost'):
         # Loading nodes
         if nodes_csv is not None:
             nodes = pd.read_csv(nodes_csv, encoding="ISO-8859-1")
