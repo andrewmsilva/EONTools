@@ -40,11 +40,11 @@ class EON(nx.Graph):
             'degree': nx.degree(self),
             'density': nx.density(self),
 
-            'radius_by_jumps': nx.radius(self),
-            'diameter_by_jumps': nx.diameter(self),
-            'center_by_jumps': nx.center(self),
-            'periphery_by_jumps': nx.periphery(self),
-            'eccentricity_by_jumps': nx.eccentricity(self),
+            'radius_by_leaps': nx.radius(self),
+            'diameter_by_leaps': nx.diameter(self),
+            'center_by_leaps': nx.center(self),
+            'periphery_by_leaps': nx.periphery(self),
+            'eccentricity_by_leaps': nx.eccentricity(self),
 
             'radius_by_length': nx.radius(self, e=ecc_by_length),
             'diameter_by_length': nx.diameter(self, e=ecc_by_length),
