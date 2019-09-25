@@ -46,11 +46,11 @@ Network reports
 
 degree : [('PortoAlegre', 2), ('Florianopolis', 2), ('SaoPaulo', 3), ('RioDeJaneiro', 3), ('Salvador', 2), ('Curitiba', 2), ('BeloHorizonte', 3), ('Brasilia', 3), ('Recife', 2), ('Fortaleza', 2)]
 density : 0.26666666666666666
-radius_by_jumps : 3
-diameter_by_jumps : 5
-center_by_jumps : ['SaoPaulo', 'RioDeJaneiro', 'BeloHorizonte', 'Brasilia']
-periphery_by_jumps : ['Florianopolis', 'Recife']
-eccentricity_by_jumps : {'PortoAlegre': 4, 'Florianopolis': 5, 'SaoPaulo': 3, 'RioDeJaneiro': 3, 'Salvador': 4, 'Curitiba': 4, 'BeloHorizonte': 3, 'Brasilia': 3, 'Recife': 5, 'Fortaleza': 4}
+radius_by_leaps : 3
+diameter_by_leaps : 5
+center_by_leaps : ['SaoPaulo', 'RioDeJaneiro', 'BeloHorizonte', 'Brasilia']
+periphery_by_leaps : ['Florianopolis', 'Recife']
+eccentricity_by_leaps : {'PortoAlegre': 4, 'Florianopolis': 5, 'SaoPaulo': 3, 'RioDeJaneiro': 3, 'Salvador': 4, 'Curitiba': 4, 'BeloHorizonte': 3, 'Brasilia': 3, 'Recife': 5, 'Fortaleza': 4}
 radius_by_length : 2090.335242478452
 diameter_by_length : 3489.524487669082
 center_by_length : ['BeloHorizonte']
