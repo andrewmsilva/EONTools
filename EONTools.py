@@ -3,7 +3,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from haversine import haversine
 from copy import deepcopy
+from itertools import combinations
 import os
+import json
 import json
 
 class EON(nx.Graph):
@@ -14,6 +16,9 @@ class EON(nx.Graph):
         nx.Graph.add_node(self, id, lat=lat, lon=lon, type=type, coord=(lat, lon))
     
     def add_link(self, source, target, length, capacity, cost):
+        if length is None:
+            coord = nx.get_node_attributes(self, 'coord')
+            length = haversine(coord[source], coord[target])
         nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
     
     def load_csv(self, nodes_csv, links_csv, 
@@ -104,32 +109,46 @@ class EON(nx.Graph):
         self.create_figure()
         plt.savefig('results/' + folder + 'network.png', format='png', dpi=600)
         
-    def add_link_by_length(self, capacity, cost, max_length=None, save_report=True, save_figure=False):
-        coord = nx.get_node_attributes(self, 'coord')
-        H = nx.complement(self)
-        i = -1
-        for link in H.edges():
-            # Calculating length
-            length = haversine(coord[link[0]], coord[link[1]])
-            if max_length is not None and length > max_length:
-                continue
-            # Creating new link
-            i += 1
-            I = deepcopy(self)
-            I.add_link(link[0], link[1], length, capacity, cost)
-            # Saving to file
-            I_df = nx.convert_matrix.to_pandas_edgelist(I, source='from', target='to')
-            folder = 'network%i/' % i
-            path = 'results/' + folder
-            try:
-                os.mkdir(path)
-            except:
-                pass
-            try:
-                I_df.to_csv(path + 'network_links.csv', index=False)
-                if save_report:
-                    I.save_reports(folder=folder)
-                if save_figure:
-                    I.save_figure(folder=folder)
-            except Exception as e:
-                print('Error saving network%i reports!' % i)
+def get_all_possible_new_links_by_length(eon, max_length=None, n_links=1):
+    coord = nx.get_node_attributes(eon, 'coord')
+    H = nx.complement(eon)
+
+    links = []
+    for link in H.edges():
+        length = haversine(coord[link[0]], coord[link[1]])
+        if max_length is None or length <= max_length:
+            links.append((link[0], link[1], length))
+    
+    return list(combinations(links, n_links))
+
+def get_all_possible_eons_with_new_links_by_length(eon, capacity, cost, n_links=1, max_length=None, possible_links=None):
+    if possible_links is None:
+        possible_links = get_all_possible_new_links_by_length(eon, max_length, n_links)
+    
+    eons = []
+    for links in possible_links:
+        H = deepcopy(eon)
+        for link in links:
+            H.add_link(link[0], link[1], link[2], capacity, cost)
+        eons.append(H)
+
+    return eons
+
+def save_eons(eons, save_report=False, save_figure=False):
+    for i in range(len(eons)):
+        eon = eons[i]
+        eon_df = nx.convert_matrix.to_pandas_edgelist(eon, source='from', target='to')
+        folder = 'network%i/' % i
+        path = 'results/' + folder
+        try:
+            os.mkdir(path)
+        except:
+            pass
+        try:
+            eon_df.to_csv(path + 'network_links.csv', index=False)
+            if save_report:
+                eon.save_reports(folder=folder)
+            if save_figure:
+                eon.save_figure(folder=folder)
+        except Exception as e:
+            print('Error saving network%i reports!' % i)

@@ -1,4 +1,4 @@
-# Elastic Optical Networks
+# EONTools, a tool library for Elastic Optical Networks
 ## Installing dependencies
 ```
 pip3 install pandas
@@ -9,25 +9,28 @@ pip3 install haversine
 ## Creating network
 ### Manually
 ```python
-import EONS
+import EONTools as et
 
-eon = EONS.EON()
+eon = et.EON()
 
 #              ID       Lat     Lon     Type
 eon.add_node('Paris', 48.8566, 2.3522, 'EOCC')
 eon.add_node('Lyon', 45.7484, 4.8467, 'EOCC')
 
 #            Source  Target  Length Capacity Cost
-eon.add_link('Paris', 'Lyon', 465.6, 100, 329.90)
+eon.add_link('Paris', 'Lyon', 393, 100, 329.90)
+# Or
+eon.add_link('Paris', 'Lyon', None, 100, 329.90)
+# Calculate length by itself
 ```
 ### Reading csv
 ```python
-import EONS
+import EONTools as et
 
 nodes_csv = 'networks/rnp/rnpBrazil_nodes.csv'
 links_csv = 'networks/rnp/rnpBrazil_links.csv'
 
-eon = EONS.EON()
+eon = et.EON()
 eon.load_csv(nodes_csv, links_csv)
 ```
 
