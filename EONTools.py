@@ -9,6 +9,8 @@ import json
 import json
 
 class EON(nx.Graph):
+    results_folder = 'results/'
+
     def __init__(self):
         nx.Graph.__init__(self)
     
@@ -19,7 +21,9 @@ class EON(nx.Graph):
         if length is None:
             coord = nx.get_node_attributes(self, 'coord')
             length = haversine(coord[source], coord[target])
-        nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
+        
+        n_fs = 320
+        nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost, frequecy_slots=[False]*n_fs)
     
     def load_csv(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 
@@ -83,7 +87,13 @@ class EON(nx.Graph):
             reports = self.reports()
         reports['degree'] = list(reports['degree'])
         reports_json = json.dumps(reports)
-        f = open('results/' + folder + "network_reports.json","w")
+        # Create results folder if does not exists
+        path = self.results_folder + folder
+        try:
+            os.mkdir(path)
+        except:
+            pass
+        f = open(self.results_folder + folder + "network_reports.json","w")
         f.write(reports_json)
         f.close()
     
@@ -107,7 +117,16 @@ class EON(nx.Graph):
     
     def save_figure(self, folder=''):
         self.create_figure()
-        plt.savefig('results/' + folder + 'network.png', format='png', dpi=600)
+        path = self.results_folder + folder
+        try:
+            os.mkdir(path)
+        except:
+            pass
+        plt.savefig(path + 'network.png', format='png', dpi=600)
+
+class Demands:
+    def add_demand(self):
+        pass
         
 def get_all_possible_new_links_by_length(eon, max_length=None, n_links=1):
     coord = nx.get_node_attributes(eon, 'coord')
@@ -138,8 +157,9 @@ def save_eons(eons, save_report=False, save_figure=False):
     for i in range(len(eons)):
         eon = eons[i]
         eon_df = nx.convert_matrix.to_pandas_edgelist(eon, source='from', target='to')
+        del eon_df['frequecy_slots']
         folder = 'network%i/' % i
-        path = 'results/' + folder
+        path = eon.results_folder + folder
         try:
             os.mkdir(path)
         except:
