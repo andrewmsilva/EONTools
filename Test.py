@@ -12,5 +12,6 @@ eon.save_reports(reports)
 
 eon.save_figure()
 
+et.random_simulation(eon, random_state=0)
+
 possible_eons = et.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
-et.save_eons(possible_eons, save_report=True, save_figure=True)

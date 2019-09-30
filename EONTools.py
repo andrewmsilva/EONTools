@@ -6,13 +6,28 @@ from copy import deepcopy
 from itertools import combinations
 import os
 import json
-import json
+import random
 
 class EON(nx.Graph):
-    results_folder = 'results/'
-
-    def __init__(self):
+    def __init__(self, results_folder=None, modulation_formats=None):
         nx.Graph.__init__(self)
+
+        if results_folder is None or type(results_folder) is not str:
+            results_folder = 'results/'
+        if type(results_folder) is str:
+            self.results_folder = results_folder
+
+        self.modulation_formats = pd.read_csv('configs/modulation_formats.csv')
+        if modulation_formats is not None:
+            if type(modulation_formats) is str:
+                modulation_formats = [modulation_formats]
+            if type(modulation_formats) is list:
+                for index, mf in self.modulation_formats.iterrows():
+                    if mf['name'] not in modulation_formats:
+                        self.modulation_formats.drop(index)
+        
+        self.all_pairs_dijkstra_path = None
+        self.all_pairs_dijkstra_path_length = None
     
     def add_node(self, id, lat, lon, type):
         nx.Graph.add_node(self, id, lat=lat, lon=lon, type=type, coord=(lat, lon))
@@ -23,7 +38,10 @@ class EON(nx.Graph):
             length = haversine(coord[source], coord[target])
         
         n_fs = 320
-        nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost, frequecy_slots=[False]*n_fs)
+        nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
+
+        self.all_pairs_dijkstra_path = dict(nx.all_pairs_dijkstra_path(self, weight='length'))
+        self.all_pairs_dijkstra_path_length = dict(nx.all_pairs_dijkstra_path_length(self, weight='length'))
     
     def load_csv(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 
@@ -45,6 +63,10 @@ class EON(nx.Graph):
         ecc_by_length = nx.eccentricity(self, sp=dict(nx.all_pairs_dijkstra_path_length(self, weight='length')))
         ecc_by_capacity = nx.eccentricity(self, sp=dict(nx.all_pairs_dijkstra_path_length(self, weight='capacity')))
         ecc_by_cost = nx.eccentricity(self, sp=dict(nx.all_pairs_dijkstra_path_length(self, weight='cost')))
+
+        lengths = list(nx.get_edge_attributes(self, 'length').values())
+        capacities = list(nx.get_edge_attributes(self, 'capacity').values())
+        costs = list(nx.get_edge_attributes(self, 'cost').values())
         reports = {
             'degree': nx.degree(self),
             'density': nx.density(self),
@@ -55,18 +77,24 @@ class EON(nx.Graph):
             'periphery_by_leaps': nx.periphery(self),
             'eccentricity_by_leaps': nx.eccentricity(self),
 
+            'min_length': min(lengths),
+            'max_length': max(lengths),
             'radius_by_length': nx.radius(self, e=ecc_by_length),
             'diameter_by_length': nx.diameter(self, e=ecc_by_length),
             'center_by_length': nx.center(self, e=ecc_by_length),
             'periphery_by_length': nx.periphery(self, e=ecc_by_length),
             'eccentricity_by_length': ecc_by_length,
 
+            'min_capacity': min(capacities),
+            'max_capacity': max(capacities),
             'radius_by_capacity': nx.radius(self, e=ecc_by_capacity),
             'diameter_by_capacity': nx.diameter(self, e=ecc_by_capacity),
             'center_by_capacity': nx.center(self, e=ecc_by_capacity),
             'periphery_by_capacity': nx.periphery(self, e=ecc_by_capacity),
             'eccentricity_by_capacity': ecc_by_capacity,
 
+            'min_cost': min(costs),
+            'max_cost': max(costs),
             'radius_by_cost': nx.radius(self, e=ecc_by_cost),
             'diameter_by_cost': nx.diameter(self, e=ecc_by_cost),
             'center_by_cost': nx.center(self, e=ecc_by_cost),
@@ -123,10 +151,6 @@ class EON(nx.Graph):
         except:
             pass
         plt.savefig(path + 'network.png', format='png', dpi=600)
-
-class Demands:
-    def add_demand(self):
-        pass
         
 def get_all_possible_new_links_by_length(eon, max_length=None, n_links=1):
     coord = nx.get_node_attributes(eon, 'coord')
@@ -157,7 +181,6 @@ def save_eons(eons, save_report=False, save_figure=False):
     for i in range(len(eons)):
         eon = eons[i]
         eon_df = nx.convert_matrix.to_pandas_edgelist(eon, source='from', target='to')
-        del eon_df['frequecy_slots']
         folder = 'network%i/' % i
         path = eon.results_folder + folder
         try:
@@ -172,3 +195,39 @@ def save_eons(eons, save_report=False, save_figure=False):
                 eon.save_figure(folder=folder)
         except Exception as e:
             print('Error saving network%i reports!' % i)
+
+def random_simulation(eon, n_frequency_slots=320, min_data_rate=10, max_data_rate=100, random_state=None):
+    # Shuffle nodes
+    if random_state is not None:
+        random.seed(random_state)
+    nodes = list(eon.nodes())
+    random.shuffle(nodes)
+
+    # Creating demands and frequency slots list
+    demands = []
+    frequecy_slots = {}
+    for i in range(len(nodes)):
+        frequecy_slots[nodes[i]] = [None]*n_frequency_slots
+        for j in range(i+1, len(nodes)):
+            demands.append({'from': nodes[i], 'to': nodes[j], 'data_rate': random.randrange(min_data_rate, max_data_rate), 'modulation_format': None,'status': False})
+    
+    for i in range(len(demands)):
+        d = demands[i]
+        # Getting the shortest path and its length
+        path = eon.all_pairs_dijkstra_path[d['from']][d['to']]
+        length = eon.all_pairs_dijkstra_path_length[d['from']][d['to']]
+        # Getting best modulation format
+        for index, mf in eon.modulation_formats.iterrows():
+            if length <= mf['reach']:
+                if d['modulation_format'] is None:
+                    d['modulation_format'] = mf
+                elif mf['data_rate'] > d['modulation_format']['data_rate']:
+                    d['modulation_format'] = mf
+        if d['modulation_format'] is None:
+            continue
+        # Executing demand
+        slots = d['data_rate'] / d['modulation_format']['data_rate']
+        print()
+        print(d['data_rate'], d['modulation_format']['data_rate'], slots)
+        for node in path:
+            print(node)
