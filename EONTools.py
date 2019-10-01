@@ -36,7 +36,6 @@ class EON(nx.Graph):
             coord = nx.get_node_attributes(self, 'coord')
             length = haversine(coord[source], coord[target])
         
-        n_fs = 320
         nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
     
     def load_csv(self, nodes_csv, links_csv, 
@@ -46,13 +45,15 @@ class EON(nx.Graph):
         if nodes_csv is not None:
             nodes = pd.read_csv(nodes_csv, encoding="ISO-8859-1")
             nodes.columns = [node_id, node_lat, node_lon, node_type] + list(nodes.columns)[4:]
-            for index, node in nodes.iterrows():
+            for node in nodes.iterrows():
+                node = node[1]
                 self.add_node(node[node_id], node[node_lat], node[node_lon], node[node_type])
         # Loading links
         if links_csv is not None:
             links = pd.read_csv(links_csv, encoding="ISO-8859-1")
             links.columns = [link_from, link_to, link_length, link_capacity, link_cost] + list(nodes.columns)[5:]
-            for index, link in links.iterrows():
+            for link in links.iterrows():
+                link = link[1]
                 self.add_link(link[link_from], link[link_to], link[link_length], link[link_capacity], link[link_cost])
 
     def reports(self):
@@ -189,15 +190,22 @@ def save_eons(eons, save_report=False, save_figure=False):
                 eon.save_reports(folder=folder)
             if save_figure:
                 eon.save_figure(folder=folder)
-        except Exception as e:
+        except:
             print('Error saving network%i reports!' % i)
 
 def Demand(source, target, data_rate, demand_id=None):
+    
     return {
         'id': demand_id,
         'from': source, 
         'to': target,
         'data_rate': data_rate,
+        'path': None,
+        'path_length': None,
+        'modulation_format': None,
+        'frequency_slots': None,
+        'spectrum_path': None,
+        'status': None,
     }
 
 def route(eon, demand):
@@ -210,7 +218,7 @@ def alloc_modulation(demand, modulation_formats):
         if demand['path_length'] <= mf['reach']:
             if demand['modulation_format'] is None:
                 demand['modulation_format'] = mf
-            elif mf['data_rate'] > demand['data_rate']:
+            elif mf['data_rate'] > demand['modulation_format']['data_rate']:
                 demand['modulation_format'] = mf
 
 def alloc_spectrum(demand, spectrum_list):
@@ -230,12 +238,13 @@ def alloc_spectrum(demand, spectrum_list):
             break
     
     if len(demand['spectrum_path']) != demand['frequency_slots']:
-        demand['spectrum_path']= None
+        demand['spectrum_path'] = None
 
 def RMSA(eon, demand, spectrum_list):
     route(eon, demand)
     alloc_modulation(demand, eon.modulation_formats)
     alloc_spectrum(demand, spectrum_list)
+    demand['status'] = demand['spectrum_path'] is not None
 
 def random_simulation(eon, frequency_slots=320, min_data_rate=10, max_data_rate=100, random_state=None):
     # Shuffle nodes
@@ -264,3 +273,8 @@ def random_simulation(eon, frequency_slots=320, min_data_rate=10, max_data_rate=
             demands.append(demand)
             
     return demands
+
+def reports_from_demands(demands):
+    for demand in demands:
+        pass
+        

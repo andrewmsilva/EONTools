@@ -12,7 +12,7 @@ eon.save_reports(reports)
 
 eon.save_figure()
 
-demands = et.random_simulation(eon, random_state=0)
+demands = et.random_simulation(eon, random_state=0, min_data_rate=150, max_data_rate=200)
 for demand in demands:
     print()
     for key, value in demand.items():
