@@ -1,3 +1,4 @@
+import warnings
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -8,6 +9,8 @@ import os
 import json
 import random
 from math import ceil
+
+warnings.filterwarnings("ignore")
 
 class EON(nx.Graph):
     def __init__(self, results_folder=None, modulation_formats=None):
@@ -223,6 +226,7 @@ def alloc_modulation(demand, modulation_formats):
 
 def alloc_spectrum(demand, spectrum_list):
     if demand['modulation_format'] is None:
+        demand['spectrum_path'] = None
         return
     # Allocating spectrum path
     demand['frequency_slots'] = ceil(demand['data_rate'] / demand['modulation_format']['data_rate'])
@@ -275,6 +279,26 @@ def random_simulation(eon, frequency_slots=320, min_data_rate=10, max_data_rate=
     return demands
 
 def reports_from_demands(demands):
+    successes = 0
+    blocks = 0
+    blocks_by_modulation = 0
+    blocks_by_spectrum = 0
+    n_demands = len(demands)
     for demand in demands:
-        pass
+        if demand['status'] is True:
+            successes += 1
+        else:
+            blocks += 1
+            if demand['modulation_format'] is None:
+                blocks_by_modulation += 1
+            elif demand['spectrum_path'] is None:
+                blocks_by_spectrum += 1
+    return {
+        'successes': successes,
+        'blocks': blocks,
+        'blocks_by_modulation': blocks_by_modulation,
+        'blocks_by_spectrum': blocks_by_spectrum,
+        'block_rate': blocks / n_demands,
+        'success_rate': successes / n_demands,
+    }
         
