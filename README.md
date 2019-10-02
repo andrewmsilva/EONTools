@@ -45,7 +45,7 @@ eon.save_reports(reports)
 ```
 ### Results
 ```python
-Network reports
+network reports
 
 degree : [('PortoAlegre', 2), ('Florianopolis', 2), ('SaoPaulo', 3), ('RioDeJaneiro', 3), ('Salvador', 2), ('Curitiba', 2), ('BeloHorizonte', 3), ('Brasilia', 3), ('Recife', 2), ('Fortaleza', 2)]
 density : 0.26666666666666666
@@ -75,6 +75,12 @@ diameter_by_cost : 5
 center_by_cost : ['SaoPaulo', 'RioDeJaneiro', 'BeloHorizonte', 'Brasilia']
 periphery_by_cost : ['Florianopolis', 'Recife']
 eccentricity_by_cost : {'PortoAlegre': 4, 'Florianopolis': 5, 'SaoPaulo': 3, 'RioDeJaneiro': 3, 'Salvador': 4, 'Curitiba': 4, 'BeloHorizonte': 3, 'Brasilia': 3, 'Recife': 5, 'Fortaleza': 4}
+successes : 0
+blocks : 0
+blocks_by_modulation : 0
+blocks_by_spectrum : 0
+block_rate : None
+success_rate : None
 ```
 ## Creating figures
 ```python
@@ -87,15 +93,15 @@ eon.save_figure()
 
 # Simulating
 ```python
-demands = et.random_simulation(eon, random_state=10, min_data_rate=50, max_data_rate=250)
+eon.random_simulation(random_state=10, min_data_rate=50, max_data_rate=250)
 # Demands is a list of dicts, each one with the data below
-print(demands[0])
+print(eon.demands[0])
 # It's possible get some reports about the simulation
-print(et.reports_from_demands(demands))
+print(eon.reports_from_demands())
 ```
 ## Result
 ```python
-{'id': 0, 'from': 'Curitiba', 'to': 'SaoPaulo', 'data_rate': 121, 'path': ['Curitiba', 'SaoPaulo'], 'path_length': 296.887622466876, 'modulation_format': {'name': '16QAM', 'data_rate': 50.0, 'power_consumption': 175, 'reach': 500, 'spectral_efficiency': 4}, 'frequency_slots': 3, 'spectrum_path': [0, 1, 2], 'status': True}
+{'from': 'Curitiba', 'to': 'SaoPaulo', 'data_rate': 121, 'nodes_path': ['Curitiba', 'SaoPaulo'], 'links_path': [('SaoPaulo', 'Curitiba')], 'path_length': 296.887622466876, 'modulation_format': {'name': '16QAM', 'data_rate': 50.0, 'power_consumption': 175, 'reach': 500, 'spectral_efficiency': 4}, 'frequency_slots': 3, 'spectrum_path': [0, 1, 2], 'status': True}
 {'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
 ```
 
@@ -107,10 +113,11 @@ possible_eons = et.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_
 
 ## Simulating them
 ```python
+possible_eons = et.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
 for i in range(len(possible_eons)):
     print('\nGraph %d simulation'%i)
-    demands = et.random_simulation(possible_eons[i], random_state=10, min_data_rate=50, max_data_rate=250)
-    print(et.reports_from_demands(demands)
+    possible_eons[i].random_simulation(random_state=10, min_data_rate=50, max_data_rate=250)
+    print(possible_eons[i].reports_from_demands())
 ```
 ### Results
 ```python
