@@ -3,7 +3,64 @@ from haversine import haversine
 from copy import deepcopy
 from itertools import combinations
 import numpy.random as random
+from math import ceil
 
+# # # # # # # # #
+# RMLSA section #
+# # # # # # # # #
+
+def route(eon, demand_id):
+    demand = eon.demands[demand_id]
+    demand['path_length'] = dict(nx.all_pairs_dijkstra_path_length(eon, weight='length'))[demand['from']][demand['to']]
+    demand['nodes_path'] = dict(nx.all_pairs_dijkstra_path(eon, weight='length'))[demand['from']][demand['to']]
+    demand['links_path'] = []
+    for i in range(len(demand['nodes_path'])-1):
+        link = (demand['nodes_path'][i], demand['nodes_path'][i+1])
+        if link not in list(eon.edges()):
+            link = (demand['nodes_path'][i+1], demand['nodes_path'][i])
+        demand['links_path'].append(link)
+
+def allocModulation(eon, demand_id):
+    demand = eon.demands[demand_id]
+    demand['modulation_format'] = None
+    for mf in eon.modulation_formats:
+        if demand['path_length'] <= mf['reach']:
+            if demand['modulation_format'] is None:
+                demand['modulation_format'] = mf
+            elif mf['data_rate'] > demand['modulation_format']['data_rate']:
+                demand['modulation_format'] = mf
+
+def allocSpectrum(eon, demand_id):
+    demand = eon.demands[demand_id]
+    if demand['modulation_format'] is None:
+        demand['spectrum_path'] = None
+        return
+    # Allocating spectrum path
+    demand['frequency_slots'] = ceil(demand['data_rate'] / demand['modulation_format']['data_rate'])
+    demand['spectrum_path'] = []
+    for i in range(eon.frequency_slots):
+        available = True
+        for link in demand['links_path']:
+            if eon.spectrum[link][i] is not None:
+                available = False
+        if available:
+            demand['spectrum_path'].append(i)
+        if len(demand['spectrum_path']) == demand['frequency_slots']:
+            break
+    
+    if len(demand['spectrum_path']) != demand['frequency_slots']:
+        demand['spectrum_path'] = None
+
+def RMLSA(eon, demand_id):
+    route(eon, demand_id)
+    allocModulation(eon, demand_id)
+    allocSpectrum(eon, demand_id)
+    demand = eon.demands[demand_id]
+    demand['status'] = demand['spectrum_path'] is not None
+
+# # # # # # # # # # # # #
+# Combinations section  #
+# # # # # # # # # # # # #
 
 def get_all_possible_new_links_by_length(eon, max_length=None, n_links=1):
     coord = nx.get_node_attributes(eon, 'coord')
@@ -30,16 +87,9 @@ def get_all_possible_eons_with_new_links_by_length(eon, capacity, cost, n_links=
 
     return eons
 
-def saveEON(eon, folder='', save_report=False, save_figure=False):
-    eon_df = nx.convert_matrix.to_pandas_edgelist(eon, source='from', target='to')
-    try:
-        eon_df.to_csv(path + 'network_links.csv', index=False)
-        if save_report:
-            eon.save_reports(folder=folder)
-        if save_figure:
-            eon.save_figure(folder=folder)
-    except:
-        print('Error saving network reports!')
+# # # # # # # # # # # #
+# Simulation section  #
+# # # # # # # # # # # #
 
 def simulateDemands(eon):
     for i in eon.demands:
@@ -59,5 +109,5 @@ def simulateRandomDemands(eon, possible_data_rate=[10, 40, 100, 200, 400, 1000],
     for i in range(len(nodes)):
         for j in range(i+1, len(nodes)):
             demand_id = eon.demands.add(nodes[i], nodes[j], random.choice(possible_data_rate, p=None))
-            eon.RMLSA(demand_id)
+            RMLSA(eon, demand_id)
             eon.executeDemand(demand_id)

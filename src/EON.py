@@ -1,7 +1,6 @@
 import networkx as nx
 import pandas as pd
 from haversine import haversine
-from math import ceil
 
 from src.Demands import Demands
 
@@ -56,6 +55,17 @@ class EON(nx.Graph):
             for link in links.iterrows():
                 link = link[1]
                 self.addLink(link[link_from], link[link_to], link[link_length], link[link_capacity], link[link_cost])
+    
+    def save(self, folder='', save_report=False, save_figure=False):
+        eon_df = nx.convert_matrix.to_pandas_edgelist(self, source='from', target='to')
+        try:
+            eon_df.to_csv(path + 'network_links.csv', index=False)
+            if save_report:
+                self.save_reports(folder=folder)
+            if save_figure:
+                self.save_figure(folder=folder)
+        except:
+            print('Error saving network reports!')
 
     # # # # # # # # # # # # # # # # #
     # Demands and spectrum section  #
@@ -71,56 +81,3 @@ class EON(nx.Graph):
             for link in demand['links_path']:
                 for j in demand['spectrum_path']:
                     self.spectrum[link][j] = demand_id
-    
-    # # # # # # # # #
-    # RMLSA section #
-    # # # # # # # # #
-    
-    def route(self, demand_id):
-        demand = self.demands[demand_id]
-        demand['path_length'] = dict(nx.all_pairs_dijkstra_path_length(self, weight='length'))[demand['from']][demand['to']]
-        demand['nodes_path'] = dict(nx.all_pairs_dijkstra_path(self, weight='length'))[demand['from']][demand['to']]
-        demand['links_path'] = []
-        for i in range(len(demand['nodes_path'])-1):
-            link = (demand['nodes_path'][i], demand['nodes_path'][i+1])
-            if link not in list(self.edges()):
-                link = (demand['nodes_path'][i+1], demand['nodes_path'][i])
-            demand['links_path'].append(link)
-
-    def allocModulation(self, demand_id):
-        demand = self.demands[demand_id]
-        demand['modulation_format'] = None
-        for mf in self.modulation_formats:
-            if demand['path_length'] <= mf['reach']:
-                if demand['modulation_format'] is None:
-                    demand['modulation_format'] = mf
-                elif mf['data_rate'] > demand['modulation_format']['data_rate']:
-                    demand['modulation_format'] = mf
-
-    def allocSpectrum(self, demand_id):
-        demand = self.demands[demand_id]
-        if demand['modulation_format'] is None:
-            demand['spectrum_path'] = None
-            return
-        # Allocating spectrum path
-        demand['frequency_slots'] = ceil(demand['data_rate'] / demand['modulation_format']['data_rate'])
-        demand['spectrum_path'] = []
-        for i in range(self.frequency_slots):
-            available = True
-            for link in demand['links_path']:
-                if self.spectrum[link][i] is not None:
-                    available = False
-            if available:
-                demand['spectrum_path'].append(i)
-            if len(demand['spectrum_path']) == demand['frequency_slots']:
-                break
-        
-        if len(demand['spectrum_path']) != demand['frequency_slots']:
-            demand['spectrum_path'] = None
-
-    def RMLSA(self, demand_id):
-        self.route(demand_id)
-        self.allocModulation(demand_id)
-        self.allocSpectrum(demand_id)
-        demand = self.demands[demand_id]
-        demand['status'] = demand['spectrum_path'] is not None
