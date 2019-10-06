@@ -1,13 +1,13 @@
 import networkx as nx
 import json
 
-def minimalReports(eon):
+def minimalReport(eon):
     return {
         'degree': nx.degree(eon),
         'density': nx.density(eon),
     }
 
-def reportsByLeaps(eon):
+def reportByLeaps(eon):
     return {
         'radius_by_leaps': nx.radius(eon),
         'diameter_by_leaps': nx.diameter(eon),
@@ -16,7 +16,7 @@ def reportsByLeaps(eon):
         'eccentricity_by_leaps': nx.eccentricity(eon),
     }
 
-def reportsByLength(eon):
+def reportByLength(eon):
     lengths = list(nx.get_edge_attributes(eon, 'length').values())
     ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     return {
@@ -29,7 +29,7 @@ def reportsByLength(eon):
         'eccentricity_by_length': ecc_by_length,
     }
 
-def reportsByCapacity(eon):
+def reportByCapacity(eon):
     ecc_by_capacity = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='capacity')))
     capacities = list(nx.get_edge_attributes(eon, 'capacity').values())
     return {
@@ -42,7 +42,7 @@ def reportsByCapacity(eon):
         'eccentricity_by_capacity': ecc_by_capacity,
     }
 
-def reportsByCost(eon):
+def reportByCost(eon):
     ecc_by_cost = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='cost')))
     costs = list(nx.get_edge_attributes(eon, 'cost').values())
     return {
@@ -55,7 +55,7 @@ def reportsByCost(eon):
         'eccentricity_by_cost': ecc_by_cost,
     }
 
-def reportsFromDemands(eon):
+def reportFromDemands(eon):
     successes = 0
     blocks = 0
     blocks_by_modulation = 0
@@ -79,22 +79,22 @@ def reportsFromDemands(eon):
         'success_rate': successes / n_demands  if n_demands > 0 else None,
     }
 
-def fullReports(eon):
-    return {**minimalReports(eon), **reportsByLeaps(eon), **reportsByLength(eon), **reportsByCapacity(eon), **reportsByCost(eon), **reportsFromDemands(eon)}
+def fullReport(eon):
+    return {**minimalReport(eon), **reportByLeaps(eon), **reportByLength(eon), **reportByCapacity(eon), **reportByCost(eon), **reportFromDemands(eon)}
 
-def printReports(eon, reports=None):
-    print('network reports\n')
-    if type(reports) is not dict:
-        reports = eon.reports()
-    for key, value in reports.items():
+def printReport(eon, report=None):
+    print('network report\n')
+    if type(report) is not dict:
+        report = eon.report()
+    for key, value in report.items():
         print(key, ':', value)
 
-def saveReports(eon, reports=None, folder=''):
-    if type(reports) is not dict:
-        reports = eon.reports()
-    reports['degree'] = list(reports['degree'])
-    reports_json = json.dumps(reports)
+def saveReport(eon, report=None, folder=''):
+    if type(report) is not dict:
+        report = eon.report()
+    report['degree'] = list(report['degree'])
+    report_json = json.dumps(report)
     # Create results folder if does not exists
-    f = open(folder + "network_reports.json","w")
-    f.write(reports_json)
+    f = open(folder + "network_report.json","w")
+    f.write(report_json)
     f.close()
