@@ -1,13 +1,13 @@
 import networkx as nx
 import json
 
-def minimalReport(eon):
+def minimal(eon):
     return {
         'degree': nx.degree(eon),
         'density': nx.density(eon),
     }
 
-def reportByLeaps(eon):
+def byLeaps(eon):
     return {
         'radius_by_leaps': nx.radius(eon),
         'diameter_by_leaps': nx.diameter(eon),
@@ -16,7 +16,7 @@ def reportByLeaps(eon):
         'eccentricity_by_leaps': nx.eccentricity(eon),
     }
 
-def reportByLength(eon):
+def byLength(eon):
     lengths = list(nx.get_edge_attributes(eon, 'length').values())
     ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     return {
@@ -29,7 +29,7 @@ def reportByLength(eon):
         'eccentricity_by_length': ecc_by_length,
     }
 
-def reportByCapacity(eon):
+def byCapacity(eon):
     ecc_by_capacity = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='capacity')))
     capacities = list(nx.get_edge_attributes(eon, 'capacity').values())
     return {
@@ -42,7 +42,7 @@ def reportByCapacity(eon):
         'eccentricity_by_capacity': ecc_by_capacity,
     }
 
-def reportByCost(eon):
+def byCost(eon):
     ecc_by_cost = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='cost')))
     costs = list(nx.get_edge_attributes(eon, 'cost').values())
     return {
@@ -79,17 +79,17 @@ def reportFromDemands(eon):
         'success_rate': successes / n_demands  if n_demands > 0 else None,
     }
 
-def fullReport(eon):
-    return {**minimalReport(eon), **reportByLeaps(eon), **reportByLength(eon), **reportByCapacity(eon), **reportByCost(eon), **reportFromDemands(eon)}
+def full(eon):
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **reportFromDemands(eon)}
 
-def printReport(eon, report=None):
+def show(eon, report=None):
     print('network report\n')
     if type(report) is not dict:
         report = eon.report()
     for key, value in report.items():
         print(key, ':', value)
 
-def saveReport(eon, report=None, folder=''):
+def save(eon, report=None, folder=''):
     if type(report) is not dict:
         report = eon.report()
     report['degree'] = list(report['degree'])

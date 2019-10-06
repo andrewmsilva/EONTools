@@ -6,9 +6,9 @@ links_csv = 'networks/rnp/rnpBrazil_links.csv'
 eon = EON(results_folder='results/')
 eon.loadCSV(nodes_csv, links_csv)
 
-report = Report.fullReport(eon)
-Report.printReport(eon, report)
-Report.saveReport(eon, report, 'results/')
+report = Report.full(eon)
+Report.show(eon, report)
+Report.save(eon, report, 'results/')
 Figure.save(eon, 'results/')
 
 # Simulating
