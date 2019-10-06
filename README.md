@@ -38,7 +38,7 @@ eon.loadCSV(nodes_csv, links_csv)
 Report.show(eon)
 Report.save(eon)
 # Or
-reports = Report.full(eon)
+report = Report.full(eon)
 Report.show(eon, report)
 Report.save(eon, report, 'results/')
 ```
