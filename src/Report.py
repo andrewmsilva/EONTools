@@ -55,7 +55,7 @@ def byCost(eon):
         'eccentricity_by_cost': ecc_by_cost,
     }
 
-def reportFromDemands(eon):
+def fromDemands(eon):
     successes = 0
     blocks = 0
     blocks_by_modulation = 0
@@ -80,7 +80,7 @@ def reportFromDemands(eon):
     }
 
 def full(eon):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **reportFromDemands(eon)}
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(eon)}
 
 def show(eon, report=None):
     print('network report\n')
