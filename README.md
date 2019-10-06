@@ -35,12 +35,12 @@ eon.loadCSV(nodes_csv, links_csv)
 
 ## Getting reports
 ```python
-eon.printReport()
-eon.saveSeports()
+Report.show(eon)
+Report.save(eon)
 # Or
-reports = eon.reports()
-eon.printReport(reports)
-eon.saveSeports(reports)
+reports = Report.full(eon)
+Report.show(eon, report)
+Report.save(eon, report, 'results/')
 ```
 ### Results
 ```python
@@ -83,9 +83,9 @@ success_rate : None
 ```
 ## Creating figures
 ```python
-eon.plot()
+Figure.plot(eon)
 # or
-eon.save()
+Figure.save(eon)
 ```
 ### Result:
 ![Network figure](/results/network.png)
