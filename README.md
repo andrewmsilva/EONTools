@@ -9,43 +9,42 @@ pip3 install haversine
 ## Creating network
 ### Manually
 ```python
-import EONTools as et
+from EONTools import EON
 
-eon = et.EON()
+eon = EON()
 
 #              ID       Lat     Lon     Type
-eon.add_node('Paris', 48.8566, 2.3522, 'EOCC')
-eon.add_node('Lyon', 45.7484, 4.8467, 'EOCC')
+eon.addNode('Paris', 48.8566, 2.3522, 'EOCC')
+eon.addNode('Lyon', 45.7484, 4.8467, 'EOCC')
 
 #            Source  Target  Length Capacity Cost
-eon.add_link('Paris', 'Lyon', 393, 100, 329.90)
-# Or
-eon.add_link('Paris', 'Lyon', None, 100, 329.90)
-# Calculate length by itself
+eon.addLink('Paris', 'Lyon', 393, 100, 329.90)
+# Or auto-calculate length by itself
+eon.addLink('Paris', 'Lyon', None, 100, 329.90)
 ```
 ### Reading csv
 ```python
-import EONTools as et
+from EONTools import EON, Report, Figure, Simulation
 
 nodes_csv = 'networks/rnp/rnpBrazil_nodes.csv'
 links_csv = 'networks/rnp/rnpBrazil_links.csv'
 
-eon = et.EON()
-eon.load_csv(nodes_csv, links_csv)
+eon = EON()
+eon.loadCSV(nodes_csv, links_csv)
 ```
 
 ## Getting reports
 ```python
-eon.print_reports()
-eon.save_reports()
-# or
+eon.printReport()
+eon.saveSeports()
+# Or
 reports = eon.reports()
-eon.print_reports(reports)
-eon.save_reports(reports)
+eon.printReport(reports)
+eon.saveSeports(reports)
 ```
 ### Results
 ```python
-network reports
+network report
 
 degree : [('PortoAlegre', 2), ('Florianopolis', 2), ('SaoPaulo', 3), ('RioDeJaneiro', 3), ('Salvador', 2), ('Curitiba', 2), ('BeloHorizonte', 3), ('Brasilia', 3), ('Recife', 2), ('Fortaleza', 2)]
 density : 0.26666666666666666
@@ -84,100 +83,100 @@ success_rate : None
 ```
 ## Creating figures
 ```python
-eon.show_figure()
+eon.plot()
 # or
-eon.save_figure()
+eon.save()
 ```
 ### Result:
 ![Network figure](/results/network.png)
 
 # Simulating
 ```python
-eon.random_simulation(random_state=10, min_data_rate=50, max_data_rate=250)
+Simulation.simulateRandomDemands(eon, random_state=10)
 # Demands is a list of dicts, each one with the data below
 print(eon.demands[0])
 # It's possible get some reports about the simulation
-print(eon.reports_from_demands())
+print(Report.fromDemands(eon))
 ```
 ## Result
 ```python
-{'from': 'Curitiba', 'to': 'SaoPaulo', 'data_rate': 121, 'nodes_path': ['Curitiba', 'SaoPaulo'], 'links_path': [('SaoPaulo', 'Curitiba')], 'path_length': 296.887622466876, 'modulation_format': {'name': '16QAM', 'data_rate': 50.0, 'power_consumption': 175, 'reach': 500, 'spectral_efficiency': 4}, 'frequency_slots': 3, 'spectrum_path': [0, 1, 2], 'status': True}
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'from': 'Recife', 'to': 'SaoPaulo', 'data_rate': 10, 'nodes_path': ['Recife', 'Salvador', 'RioDeJaneiro', 'SaoPaulo'], 'links_path': [('Salvador', 'Recife'), ('RioDeJaneiro', 'Salvador'), ('SaoPaulo', 'RioDeJaneiro')], 'path_length': 2156.743814583565, 'modulation_format': {'name': 'BPSK', 'data_rate': 12.5, 'power_consumption': 112, 'reach': 4000, 'spectral_efficiency': 1}, 'frequency_slots': 1, 'spectrum_path': [0], 'status': True}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 ```
 
 # Getting all possible networks with new links
 ```python
 #                                                                Capacity Cost
-possible_eons = et.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
+possible_eons = Simulation.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
 ```
 
 ## Simulating them
 ```python
-possible_eons = et.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
+possible_eons = Simulation.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=report['diameter_by_length'] / 2)
 for i in range(len(possible_eons)):
     print('\nGraph %d simulation'%i)
-    possible_eons[i].random_simulation(random_state=10, min_data_rate=50, max_data_rate=250)
-    print(possible_eons[i].reports_from_demands())
+    Simulation.simulateRandomDemands(possible_eons[i], random_state=10)
+    print(Report.fromDemands(possible_eons[i])
 ```
 ### Results
 ```python
 Graph 0 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 1 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 2 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 3 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 4 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 30, 'blocks': 15, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 15, 'block_rate': 0.3333333333333333, 'success_rate': 0.6666666666666666}
 
 Graph 5 simulation
-{'successes': 44, 'blocks': 1, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 1, 'block_rate': 0.022222222222222223, 'success_rate': 0.9777777777777777}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 6 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
 Graph 7 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 8 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 9 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
 Graph 10 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 11 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 12 simulation
-{'successes': 45, 'blocks': 0, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 0, 'block_rate': 0.0, 'success_rate': 1.0}
+{'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
 Graph 13 simulation
-{'successes': 44, 'blocks': 1, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 1, 'block_rate': 0.022222222222222223, 'success_rate': 0.9777777777777777}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 14 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 15 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 16 simulation
-{'successes': 43, 'blocks': 2, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 2, 'block_rate': 0.044444444444444446, 'success_rate': 0.9555555555555556}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 17 simulation
-{'successes': 44, 'blocks': 1, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 1, 'block_rate': 0.022222222222222223, 'success_rate': 0.9777777777777777}
+{'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
 Graph 18 simulation
-{'successes': 44, 'blocks': 1, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 1, 'block_rate': 0.022222222222222223, 'success_rate': 0.9777777777777777}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
 Graph 19 simulation
-{'successes': 44, 'blocks': 1, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 1, 'block_rate': 0.022222222222222223, 'success_rate': 0.9777777777777777}
+{'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 ```
