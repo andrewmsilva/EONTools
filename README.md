@@ -39,8 +39,8 @@ Report.show(eon)
 Report.save(eon)
 # Or
 report = Report.full(eon)
-Report.show(eon, report)
-Report.save(eon, report, 'results/')
+Report.show(report)
+Report.save(report, 'results/')
 ```
 ### Results
 ```python
@@ -92,31 +92,34 @@ Figure.save(eon)
 
 # Simulating
 ```python
-Simulation.simulateRandomDemands(eon, random_state=10)
-# Demands is a list of dicts, each one with the data below
-print(eon.demands[0])
-# It's possible get some reports about the simulation
-print(Report.fromDemands(eon))
+print('\nOriginal EON simulation')
+eon.resetSpectrum()
+demands = Simulation.createRandomDemands(eon, random_state=10)
+demands = Simulation.simulateDemands(eon, demands)
+print(Report.fromDemands(demands))
 ```
 ## Result
 ```python
-{'from': 'Recife', 'to': 'SaoPaulo', 'data_rate': 10, 'nodes_path': ['Recife', 'Salvador', 'RioDeJaneiro', 'SaoPaulo'], 'links_path': [('Salvador', 'Recife'), ('RioDeJaneiro', 'Salvador'), ('SaoPaulo', 'RioDeJaneiro')], 'path_length': 2156.743814583565, 'modulation_format': {'name': 'BPSK', 'data_rate': 12.5, 'power_consumption': 112, 'reach': 4000, 'spectral_efficiency': 1}, 'frequency_slots': 1, 'spectrum_path': [0], 'status': True}
+Original EON simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 ```
 
 # Getting all possible networks with new links
 ```python
 #                                                                Capacity Cost
-possible_eons = Simulation.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=reports['diameter_by_length'] / 2)
+possible_eons = Simulation.getPossibleEonsWithNewLinks(eon, 50, 1, n_links=1, max_length=report['diameter_by_length'] / 2)
 ```
 
 ## Simulating them
 ```python
-possible_eons = Simulation.get_all_possible_eons_with_new_links_by_length(eon, 50, 1, n_links=1, max_length=report['diameter_by_length'] / 2)
-for i in range(len(possible_eons)):
-    print('\nGraph %d simulation'%i)
-    Simulation.simulateRandomDemands(possible_eons[i], random_state=10)
-    print(Report.fromDemands(possible_eons[i])
+i = 0
+for possible_eon in possible_eons:
+    print('\nEON', i, 'simulation')
+    i += 1
+    possible_eon.resetSpectrum()
+    demands = Simulation.createRandomDemands(possible_eon, random_state=10)
+    demands = Simulation.simulateDemands(possible_eon, demands)
+    print(Report.fromDemands(demands))
 ```
 ### Results
 ```python
