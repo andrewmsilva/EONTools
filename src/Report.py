@@ -55,20 +55,21 @@ def byCost(eon):
         'eccentricity_by_cost': ecc_by_cost,
     }
 
-def fromDemands(eon):
+def fromDemands(demands):
     successes = 0
     blocks = 0
     blocks_by_modulation = 0
     blocks_by_spectrum = 0
-    n_demands = len(eon.demands)
-    for demand in eon.demands:
-        if demand['status'] is True:
+    n_demands = 0
+    for demand in demands:
+        n_demands += 1
+        if demand.status is True:
             successes += 1
         else:
             blocks += 1
-            if demand['modulation_format'] is None:
+            if demand.modulation_level is None:
                 blocks_by_modulation += 1
-            elif demand['spectrum_path'] is None:
+            elif demand.spectrum_path is None:
                 blocks_by_spectrum += 1
     return {
         'successes': successes,
@@ -79,19 +80,15 @@ def fromDemands(eon):
         'success_rate': successes / n_demands  if n_demands > 0 else None,
     }
 
-def full(eon):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(eon)}
+def full(eon, demands=[]):
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(demands)}
 
-def show(eon, report=None):
+def show(report):
     print('network report\n')
-    if type(report) is not dict:
-        report = eon.report()
     for key, value in report.items():
         print(key, ':', value)
 
-def save(eon, report=None, folder=''):
-    if type(report) is not dict:
-        report = eon.report()
+def save(report, folder=''):
     report['degree'] = list(report['degree'])
     report_json = json.dumps(report)
     # Create results folder if does not exists

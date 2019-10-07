@@ -2,8 +2,6 @@ import networkx as nx
 import pandas as pd
 from haversine import haversine
 
-from src.Demands import Demands
-
 class EON(nx.Graph):
     # # # # # # # # # # #
     # Building section  #
@@ -15,7 +13,7 @@ class EON(nx.Graph):
         self.frequency_slots = frequency_slots
         self.spectrum = {}
         self.results_folder = results_folder
-        self.demands = Demands()
+        self.demands = []
 
         self.modulation_formats = pd.read_csv('src/configs/modulation_formats.csv')
         self.modulation_formats = self.modulation_formats.to_dict(orient='records')
@@ -56,6 +54,10 @@ class EON(nx.Graph):
                 link = link[1]
                 self.addLink(link[link_from], link[link_to], link[link_length], link[link_capacity], link[link_cost])
     
+    def resetSpectrum(self):
+        links = self.edges()
+        self.spectrum = dict(zip(links, [[None]*self.frequency_slots]*len(links)))
+
     def save(self, folder='', save_report=False, save_figure=False):
         eon_df = nx.convert_matrix.to_pandas_edgelist(self, source='from', target='to')
         try:
@@ -66,18 +68,3 @@ class EON(nx.Graph):
                 self.save_figure(folder=folder)
         except:
             print('Error saving network reports!')
-
-    # # # # # # # # # # # # # # # # #
-    # Demands and spectrum section  #
-    # # # # # # # # # # # # # # # # #
-
-    def resetSpectrum(self):
-        links = self.edges()
-        self.spectrum = dict(zip(links, [[None]*self.frequency_slots]*len(links)))
-    
-    def executeDemand(self, demand_id):
-        demand = self.demands[demand_id]
-        if type(demand['spectrum_path']) is list:
-            for link in demand['links_path']:
-                for j in demand['spectrum_path']:
-                    self.spectrum[link][j] = demand_id

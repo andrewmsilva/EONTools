@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def create(eon):
+def draw(eon):
     # Clearing figure buffer
     plt.cla()
     plt.close()
@@ -15,10 +15,8 @@ def create(eon):
         labels[link] = str(round(labels[link])) + ' Km'
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=2)
 
-def plot(eon):
-    create(eon)
+def plot():
     plt.show()
 
-def save(eon, folder=''):
-    create(eon)
+def save(folder=''):
     plt.savefig(folder + 'network.png', format='png', dpi=600)

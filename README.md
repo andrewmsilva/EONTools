@@ -120,63 +120,63 @@ for i in range(len(possible_eons)):
 ```
 ### Results
 ```python
-Graph 0 simulation
+EON 0 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 1 simulation
+EON 1 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 2 simulation
+EON 2 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 3 simulation
+EON 3 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 4 simulation
+EON 4 simulation
 {'successes': 30, 'blocks': 15, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 15, 'block_rate': 0.3333333333333333, 'success_rate': 0.6666666666666666}
 
-Graph 5 simulation
+EON 5 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 6 simulation
+EON 6 simulation
 {'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
-Graph 7 simulation
+EON 7 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 8 simulation
+EON 8 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 9 simulation
+EON 9 simulation
 {'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
-Graph 10 simulation
+EON 10 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 11 simulation
+EON 11 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 12 simulation
+EON 12 simulation
 {'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
-Graph 13 simulation
+EON 13 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 14 simulation
+EON 14 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 15 simulation
+EON 15 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 16 simulation
+EON 16 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 17 simulation
+EON 17 simulation
 {'successes': 29, 'blocks': 16, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 16, 'block_rate': 0.35555555555555557, 'success_rate': 0.6444444444444445}
 
-Graph 18 simulation
+EON 18 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 
-Graph 19 simulation
+EON 19 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 ```
