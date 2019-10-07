@@ -17,7 +17,7 @@ class EON(nx.Graph):
         self.results_folder = results_folder
         self.demands = Demands()
 
-        self.modulation_formats = pd.read_csv('configs/modulation_formats.csv')
+        self.modulation_formats = pd.read_csv('src/configs/modulation_formats.csv')
         self.modulation_formats = self.modulation_formats.to_dict(orient='records')
         if modulation_formats is not None:
             if type(modulation_formats) is str:
