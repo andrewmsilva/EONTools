@@ -1,7 +1,0 @@
-"name","data_rate","power_consumption","reach","spectral_efficiency"
-"BPSK",12.5,112,4000,1
-"QPSK",25.0,133,2000,2
-"8QAM",37.5,154,1000,3
-"16QAM",50.0,175,500,4
-"32QAM",62.5,196,250,5
-"64QAM",75.0,217,125,6
