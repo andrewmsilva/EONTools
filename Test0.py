@@ -1,31 +1,36 @@
-from EONTools import EON, Report, Figure, Simulation
+from EONTools import *
 
-nodes_csv = 'networks/rnp/rnpBrazil_nodes.csv'
-links_csv = 'networks/rnp/rnpBrazil_links.csv'
-
-eon = EON(results_folder='results/')
+# Loading EON
+nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
+links_csv = 'input/rnp/rnpBrazil_links.csv'
+eon = EON(results_folder='results/', name='Original EON')
 eon.loadCSV(nodes_csv, links_csv)
 
+# Getting report
 report = Report.full(eon)
 Report.show(report)
 Report.save(report, 'results/')
 
+# Saving figure
 Figure.draw(eon)
 Figure.save('results/')
 
-# Simulating
-print('\nOriginal EON simulation')
+# Getting modulation levels
+modulation_levels = loadModulationLevels('input/modulation_levels.csv')
+print(modulation_levels)
+
+# Simulating original EON
+print('\nSimulating', eon)
 eon.resetSpectrum()
 demands = Simulation.createRandomDemands(eon, random_state=10)
-demands = Simulation.simulateDemands(eon, demands)
+demands = Simulation.simulateDemands(eon, modulation_levels, demands)
 print(Report.fromDemands(demands))
 
+# Simulating possible EONs with new links
 possible_eons = Simulation.getPossibleEonsWithNewLinks(eon, 50, 1, n_links=1, max_length=report['diameter_by_length'] / 2)
-i = 0
 for possible_eon in possible_eons:
-    print('\nEON', i, 'simulation')
-    i += 1
+    print('\nSimulating', possible_eon)
     possible_eon.resetSpectrum()
     demands = Simulation.createRandomDemands(possible_eon, random_state=10)
-    demands = Simulation.simulateDemands(possible_eon, demands)
+    demands = Simulation.simulateDemands(possible_eon, modulation_levels, demands)
     print(Report.fromDemands(demands))

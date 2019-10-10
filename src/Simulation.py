@@ -29,8 +29,8 @@ class Demand():
 # # # # # # # # #
 
 def route(eon, demand):
-    demand.path_length = dict(nx.all_pairs_dijkstra_path_length(eon, weight='length'))[demand.source][demand.target]
-    demand.nodes_path = dict(nx.all_pairs_dijkstra_path(eon, weight='length'))[demand.source][demand.target]
+    demand.path_length = eon.dijkstra_path_length[demand.source][demand.target]
+    demand.nodes_path = eon.dijkstra_path[demand.source][demand.target]
     demand.links_path = []
     for i in range(len(demand.nodes_path)-1):
         link = (demand.nodes_path[i], demand.nodes_path[i+1])
@@ -38,13 +38,13 @@ def route(eon, demand):
             link = (link[1], link[0])
         demand.links_path.append(link)
 
-def allocModulation(eon, demand):
+def allocModulation(modulation_levels, demand):
     demand.modulation_level = None
-    for ml in eon.modulation_formats:
-        if demand.path_length <= ml['reach']:
+    for ml in modulation_levels:
+        if demand.path_length <= ml.reach:
             if demand.modulation_level is None:
                 demand.modulation_level = ml
-            elif ml['data_rate'] > demand.modulation_level['data_rate']:
+            elif ml.data_rate > demand.modulation_level.data_rate:
                 demand.modulation_level = ml
 
 def allocSpectrum(eon, demand):
@@ -52,7 +52,7 @@ def allocSpectrum(eon, demand):
         demand.spectrum_path = None
         return
     # Allocating spectrum path
-    demand.frequency_slots = ceil(demand.data_rate / demand.modulation_level['data_rate'])
+    demand.frequency_slots = ceil(demand.data_rate / demand.modulation_level.data_rate)
     demand.spectrum_path = []
     for i in range(eon.frequency_slots):
         available = True
@@ -67,9 +67,9 @@ def allocSpectrum(eon, demand):
     if len(demand.spectrum_path) != demand.frequency_slots:
         demand.spectrum_path = None
 
-def RMLSA(eon, demand):
+def RMLSA(eon, modulation_levels, demand):
     route(eon, demand)
-    allocModulation(eon, demand)
+    allocModulation(modulation_levels, demand)
     allocSpectrum(eon, demand)
     demand.status = demand.spectrum_path is not None
 
@@ -93,8 +93,11 @@ def getPossibleEonsWithNewLinks(eon, capacity, cost, n_links=1, max_length=None,
     if possible_links is None:
         possible_links = getPossibleNewLinks(eon, max_length, n_links)
     
+    count = 0
     for links in possible_links:
+        count += 1
         H = deepcopy(eon)
+        H.name = '%dth Possible EON'%count
         for link in links:
             H.addLink(link[0], link[1], link[2], capacity, cost)
         yield H
@@ -110,13 +113,13 @@ def executeDemand(eon, demand):
                 eon.spectrum[link][j] = demand.id
 
 def simulateDemand(eon, demand):
-    RMLSA(eon, demand)
+    RMLSA(eon, modulation_levels, demand)
     executeDemand(eon, demand)
     yield demand
 
-def simulateDemands(eon, demands):
+def simulateDemands(eon, modulation_levels, demands):
     for demand in demands:
-        RMLSA(eon, demand)
+        RMLSA(eon, modulation_levels, demand)
         executeDemand(eon, demand)
         yield demand
 
