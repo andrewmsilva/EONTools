@@ -7,13 +7,12 @@ class EON(nx.Graph):
     # Building section  #
     # # # # # # # # # # #
 
-    def __init__(self, results_folder='', frequency_slots=320, name='EON'):
+    def __init__(self, frequency_slots=320, name='EON'):
         nx.Graph.__init__(self)
 
         self.name = name
         self.frequency_slots = frequency_slots
         self.spectrum = {}
-        self.results_folder = results_folder
         self.dijkstra_path = None
         self.dijkstra_path_length = None
 
@@ -34,9 +33,6 @@ class EON(nx.Graph):
         nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
         # Building the link spectrum
         self.spectrum[(source, target)] = [None]*self.frequency_slots
-        # Calculating dijkstra
-        self.dijkstra_path = dict(nx.all_pairs_dijkstra_path(self, weight='length'))
-        self.dijkstra_path_length = dict(nx.all_pairs_dijkstra_path_length(self, weight='length'))
     
     def loadCSV(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 

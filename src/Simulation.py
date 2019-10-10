@@ -29,6 +29,12 @@ class Demand():
 # # # # # # # # #
 
 def route(eon, demand):
+    # Calculating dijkstra if it is not done yet
+    if eon.dijkstra_path_length is None:
+        eon.dijkstra_path_length = dict(nx.all_pairs_dijkstra_path_length(eon, weight='length'))
+    if eon.dijkstra_path is None:
+        eon.dijkstra_path = dict(nx.all_pairs_dijkstra_path(eon, weight='length'))
+    # Getting paths
     demand.path_length = eon.dijkstra_path_length[demand.source][demand.target]
     demand.nodes_path = eon.dijkstra_path[demand.source][demand.target]
     demand.links_path = []
@@ -89,7 +95,7 @@ def getPossibleNewLinks(eon, max_length=None, n_links=1):
     
     return combinations(links, n_links)
 
-def getPossibleEonsWithNewLinks(eon, capacity, cost, n_links=1, max_length=None, possible_links=None):
+def getPossibleEonsWithNewLinks(eon, capacity, cost, max_length=None, n_links=1, k_edge_connected=None, possible_links=None):
     if possible_links is None:
         possible_links = getPossibleNewLinks(eon, max_length, n_links)
     
@@ -100,7 +106,8 @@ def getPossibleEonsWithNewLinks(eon, capacity, cost, n_links=1, max_length=None,
         H.name = '%dth Possible EON'%count
         for link in links:
             H.addLink(link[0], link[1], link[2], capacity, cost)
-        yield H
+        if k_edge_connected is None or nx.is_k_edge_connected(H, k_edge_connected):
+            yield H
 
 # # # # # # # # # # # #
 # Simulation section  #
