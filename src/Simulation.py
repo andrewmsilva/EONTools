@@ -137,6 +137,11 @@ def createRandomDemands(eon, n_demands=None, possible_data_rate=[10, 40, 100, 20
     nodes = list(eon.nodes())
     random.shuffle(nodes)
     demand_id = 0
+    # Setting data rate probabilities
+    length = len(possible_data_rate)
+    total = (length**2 + length)/2
+    p = [x/total for x in range(length, 0, -1)]
+    # Creating demands
     for source, target in combinations(nodes, 2):
-        yield Demand(demand_id, source, target, random.choice(possible_data_rate))
+        yield Demand(demand_id, source, target, random.choice(possible_data_rate, p=p))
         demand_id += 1

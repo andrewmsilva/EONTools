@@ -3,7 +3,7 @@ from EONTools import *
 # Loading EON
 nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
 links_csv = 'input/rnp/rnpBrazil_links.csv'
-eon = EON(name='Original EON')
+eon = EON(name='Original EON', frequency_slots=160)
 eon.loadCSV(nodes_csv, links_csv)
 
 # Getting report

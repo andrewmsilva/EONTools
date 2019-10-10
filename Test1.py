@@ -2,7 +2,7 @@ from EONTools import *
 
 # Loading EON
 nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
-eon = EON(name='EON without links')
+eon = EON(name='EON without links', frequency_slots=160)
 eon.loadCSV(nodes_csv, None)
 
 # Getting modulation levels
@@ -11,8 +11,9 @@ print(modulation_levels)
 
 # Simulating all possibilities
 n = len(eon.nodes())
-print('Simulating for %d to %d new links' %(n-1, n*(n-1)*2))
-for n_links in range(n*(n-1)*2, n+1, -1):
+full = int(n*(n-1)/2)
+print('Simulating for %d to %d new links' %(n, full))
+for n_links in range(full, n+1, -1):
     print('For %d new links'%n_links)
     possible_eons = Simulation.getPossibleEonsWithNewLinks(eon, 50, 1, n_links=n_links, k_edge_connected=2)
     for possible_eon in possible_eons:
