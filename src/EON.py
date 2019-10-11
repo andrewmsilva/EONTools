@@ -1,20 +1,17 @@
 import networkx as nx
 from pandas import read_csv
 from haversine import haversine
+from itertools import islice
 
 class EON(nx.Graph):
-    # # # # # # # # # # #
-    # Building section  #
-    # # # # # # # # # # #
-
     def __init__(self, frequency_slots=320, name='EON'):
         nx.Graph.__init__(self)
 
         self.name = name
         self.frequency_slots = frequency_slots
         self.spectrum = {}
-        self.dijkstra_path = None
-        self.dijkstra_path_length = None
+        self.shortest_path = None
+        self.shortest_path_length = None
 
     def __repr__(self):
         return self.name
@@ -55,6 +52,29 @@ class EON(nx.Graph):
     def resetSpectrum(self):
         links = self.edges()
         self.spectrum = dict(zip(links, [[None]*self.frequency_slots]*len(links)))
+    
+    def initializeRoutes(self, k_shortest_paths=2):
+        nodes = list(self.nodes())
+        self.shortest_path = {}
+        self.shortest_path_length = {}
+        for i in range(len(nodes)):
+            source = nodes[i]
+            self.shortest_path[source] = {}
+            self.shortest_path_length[source] = {}
+            for j in range(i+1, len(nodes)):
+                target = nodes[j]
+                self.shortest_path[source][target] = list(islice(nx.shortest_simple_paths(self, source, target, weight='length'), k_shortest_paths))
+                self.shortest_path_length[source][target] = []
+                # Calculating lengths
+                for path in self.shortest_path[source][target]:
+                    length = 0
+                    for k in range(len(path)-1):
+                        try:
+                            link = self[path[k]][path[k+1]]
+                        except:
+                            link = self[path[k+1]][path[k]]
+                        length += link['length']
+                    self.shortest_path_length[source][target].append(length)
 
     def save(self, folder='', save_report=False, save_figure=False):
         eon_df = nx.convert_matrix.to_pandas_edgelist(self, source='from', target='to')

@@ -10,9 +10,12 @@ from math import ceil
 # Demand section  #
 # # # # # # # # # #
 
+DEMAND_ID = 0
+
 class Demand():
-    def __init__(self, id, source, target, data_rate):
-        self.id = id
+    def __init__(self, source, target, data_rate):
+        global DEMAND_ID
+        self.id = DEMAND_ID
         self.source = source
         self.target = target
         self.data_rate = data_rate
@@ -23,20 +26,24 @@ class Demand():
         self.frequency_slots = None
         self.spectrum_path = None
         self.status = None
+        DEMAND_ID += 1
+    
+    def __repr__(self):
+        return '<%d: %s to %s with %d GBps>'%(self.id, self.source, self.target, self.data_rate)
+    
+    def __str__(self):
+        return '<%d: %s to %s with %d GBps>'%(self.id, self.source, self.target, self.data_rate)
 
 # # # # # # # # #
 # RMLSA section #
 # # # # # # # # #
 
 def route(eon, demand):
-    # Calculating dijkstra if it is not done yet
-    if eon.dijkstra_path_length is None:
-        eon.dijkstra_path_length = dict(nx.all_pairs_dijkstra_path_length(eon, weight='length'))
-    if eon.dijkstra_path is None:
-        eon.dijkstra_path = dict(nx.all_pairs_dijkstra_path(eon, weight='length'))
+    if eon.shortest_path is None:
+        eon.initializeRoutes()
     # Getting paths
-    demand.path_length = eon.dijkstra_path_length[demand.source][demand.target]
-    demand.nodes_path = eon.dijkstra_path[demand.source][demand.target]
+    demand.path_length = eon.shortest_path_length[demand.source][demand.target][0]
+    demand.nodes_path = eon.shortest_path[demand.source][demand.target][0]
     demand.links_path = []
     for i in range(len(demand.nodes_path)-1):
         link = (demand.nodes_path[i], demand.nodes_path[i+1])
@@ -135,13 +142,16 @@ def createRandomDemands(eon, n_demands=None, possible_data_rate=[10, 40, 100, 20
     if random_state is not None:
         random.seed(random_state)
     nodes = list(eon.nodes())
-    random.shuffle(nodes)
-    demand_id = 0
     # Setting data rate probabilities
     length = len(possible_data_rate)
     total = (length**2 + length)/2
     p = [x/total for x in range(length, 0, -1)]
     # Creating demands
-    for source, target in combinations(nodes, 2):
-        yield Demand(demand_id, source, target, random.choice(possible_data_rate, p=p))
-        demand_id += 1
+    if n_demands is None:
+        n = len(nodes)
+        n_demands = (n**2 - n)/2
+    count = 0
+    while count < n_demands:
+        count += 1
+        indices = sorted(random.choice(nodes, size=2, replace=False))
+        yield Demand(indices[0], indices[1], random.choice(possible_data_rate, p=p))
