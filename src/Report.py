@@ -55,44 +55,42 @@ def byCost(eon):
         'eccentricity_by_cost': ecc_by_cost,
     }
 
-def fromDemands(eon):
+def fromDemands(demands):
+    total_data_rate = 0
+    unexecuted = 0
     successes = 0
     blocks = 0
-    blocks_by_modulation = 0
-    blocks_by_spectrum = 0
-    n_demands = len(eon.demands)
-    for demand in eon.demands:
-        if demand['status'] is True:
+    n_demands = 0
+    for demand in demands:
+        n_demands += 1
+        if demand.status is None:
+            unexecuted += 1
+        elif demand.status is True:
             successes += 1
+            total_data_rate += demand.data_rate
         else:
             blocks += 1
-            if demand['modulation_format'] is None:
-                blocks_by_modulation += 1
-            elif demand['spectrum_path'] is None:
-                blocks_by_spectrum += 1
     return {
+        'total_data_rate': total_data_rate,
+        'unexecuted': unexecuted,
         'successes': successes,
         'blocks': blocks,
-        'blocks_by_modulation': blocks_by_modulation,
-        'blocks_by_spectrum': blocks_by_spectrum,
-        'block_rate': blocks / n_demands if n_demands > 0 else None,
+        'unexecuted_rate': unexecuted / n_demands if n_demands > 0 else None,
         'success_rate': successes / n_demands  if n_demands > 0 else None,
+        'block_rate': blocks / n_demands if n_demands > 0 else None,
     }
 
-def full(eon):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(eon)}
+def full(eon, demands=[]):
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(demands)}
 
-def show(eon, report=None):
+def show(report):
     print('network report\n')
-    if type(report) is not dict:
-        report = eon.report()
     for key, value in report.items():
         print(key, ':', value)
 
-def save(eon, report=None, folder=''):
-    if type(report) is not dict:
-        report = eon.report()
-    report['degree'] = list(report['degree'])
+def save(report, folder=''):
+    if 'degree' in report.keys():
+        report['degree'] = list(report['degree'])
     report_json = json.dumps(report)
     # Create results folder if does not exists
     f = open(folder + "network_report.json","w")
