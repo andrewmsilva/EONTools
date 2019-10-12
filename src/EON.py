@@ -4,20 +4,21 @@ from haversine import haversine
 from itertools import islice
 
 class EON(nx.Graph):
-    def __init__(self, frequency_slots=320, name='EON'):
+    def __init__(self, frequency_slots=320, name='EON', k_paths=3):
         nx.Graph.__init__(self)
 
         self.name = name
         self.frequency_slots = frequency_slots
         self.spectrum = {}
+        self.k_paths = k_paths
         self.shortest_path = None
         self.shortest_path_length = None
 
     def __repr__(self):
-        return self.name
+        return '<%s>'%self.name
     
     def __str__(self):
-        return self.name
+        return '<%s>'%self.name
         
     def addNode(self, id, lat, lon, type):
         nx.Graph.add_node(self, id, lat=lat, lon=lon, type=type, coord=(lat, lon))
@@ -29,7 +30,8 @@ class EON(nx.Graph):
         
         nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
         # Building the link spectrum
-        self.spectrum[(source, target)] = [None]*self.frequency_slots
+        link = (source, target)
+        self.spectrum[link] = [None]*self.frequency_slots
     
     def loadCSV(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 
@@ -50,31 +52,37 @@ class EON(nx.Graph):
                 self.addLink(link[link_from], link[link_to], link[link_length], link[link_capacity], link[link_cost])
     
     def resetSpectrum(self):
-        links = self.edges()
-        self.spectrum = dict(zip(links, [[None]*self.frequency_slots]*len(links)))
+        for link in self.spectrum.keys():
+            self.spectrum[link] = [None]*self.frequency_slots
     
-    def initializeRoutes(self, k_shortest_paths=2):
-        nodes = list(self.nodes())
-        self.shortest_path = {}
-        self.shortest_path_length = {}
-        for i in range(len(nodes)):
-            source = nodes[i]
+    def createKShortestPaths(self, source, target):
+        if source not in self.shortest_path.keys():
             self.shortest_path[source] = {}
             self.shortest_path_length[source] = {}
-            for j in range(i+1, len(nodes)):
-                target = nodes[j]
-                self.shortest_path[source][target] = list(islice(nx.shortest_simple_paths(self, source, target, weight='length'), k_shortest_paths))
-                self.shortest_path_length[source][target] = []
-                # Calculating lengths
-                for path in self.shortest_path[source][target]:
-                    length = 0
-                    for k in range(len(path)-1):
-                        try:
-                            link = self[path[k]][path[k+1]]
-                        except:
-                            link = self[path[k+1]][path[k]]
-                        length += link['length']
-                    self.shortest_path_length[source][target].append(length)
+        try:
+            self.shortest_path[source][target] = list(islice(nx.shortest_simple_paths(self, source, target, weight='length'), self.k_paths))
+        except nx.exception.NetworkXNoPath:
+            self.shortest_path[source][target] = []
+        #print(self.shortest_path[source][target])
+        self.shortest_path_length[source][target] = []
+        # Calculating lengths
+        for path in self.shortest_path[source][target]:
+            length = 0
+            for i in range(len(path)-1):
+                try:
+                    link = self[path[i]][path[i+1]]
+                except:
+                    link = self[path[i+1]][path[i]]
+                length += link['length']
+            self.shortest_path_length[source][target].append(length)
+    
+    def initializeRoutes(self):
+        self.shortest_path = {}
+        self.shortest_path_length = {}
+        for source in self.nodes():
+            for target in self.nodes():
+                self.createKShortestPaths(source, target)
+                self.createKShortestPaths(target, source)
 
     def save(self, folder='', save_report=False, save_figure=False):
         eon_df = nx.convert_matrix.to_pandas_edgelist(self, source='from', target='to')

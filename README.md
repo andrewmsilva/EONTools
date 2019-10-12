@@ -1,13 +1,39 @@
 # EONTools, a tool library for Elastic Optical Networks
-## Installing dependencies
-```
-pip3 install pandas
-pip3 install matplotlib
-pip3 install networkx
-pip3 install haversine
-```
-## Creating network
-### Manually
+
+## Installing
+
+### OMNet++
+
+1. > \$ sudo apt-get update
+2. > \$ sudo apt-get install build-essential gcc g++ bison flex perl \python python3 qt5-default libqt5opengl5-dev tcl-dev tk-dev \libxml2-dev zlib1g-dev default-jre doxygen graphviz libwebkitgtk-1.0 openscenegraph-plugin-osgearth libosgearth-dev openmpi-bin libopenmpi-dev libpcap-dev gnome-color-chooser nemiver
+3. Download OMNet++ from [here](https://omnetpp.org/download/)
+4. > \$ cd Downloads
+5. > \$ tar xvfz omnetpp-5.5.1-src-linux.tgz
+6. Move the folder somewhere you choose
+7. > \$ cd omnetpp-5.5.1
+8. > \$ . setenv
+9. > \$ sudo gedit ~/.bashrc
+10. Add the following line at the end of the file, then save it: `export PATH=$PATH:/home/YOUR_USER/FOLDER_YOU_CHOOSE/omnetpp-5.5.1/bin`
+11. > \$ ./configure
+12. > \$ make
+13. > \$ omnetpp
+
+### Python libraries
+
+> \$ pip install pandas
+
+> \$ pip install matplotlib
+
+> \$ pip install networkx
+
+> \$ pip install haversine
+
+## Developing
+
+### Creating network
+
+#### Manually
+
 ```python
 from EONTools import EON
 
@@ -22,7 +48,9 @@ eon.addLink('Paris', 'Lyon', 393, 100, 329.90)
 # Or auto-calculate length by itself
 eon.addLink('Paris', 'Lyon', None, 100, 329.90)
 ```
-### Reading csv
+
+#### Reading csv
+
 ```python
 from EONTools import EON, Report, Figure, Simulation
 
@@ -33,7 +61,8 @@ eon = EON()
 eon.loadCSV(nodes_csv, links_csv)
 ```
 
-## Getting reports
+### Getting reports
+
 ```python
 Report.show(eon)
 Report.save(eon)
@@ -42,7 +71,9 @@ report = Report.full(eon)
 Report.show(report)
 Report.save(report, 'results/')
 ```
-### Results
+
+#### Results
+
 ```python
 network report
 
@@ -81,16 +112,21 @@ blocks_by_spectrum : 0
 block_rate : None
 success_rate : None
 ```
-## Creating figures
+
+### Creating figures
+
 ```python
 Figure.plot(eon)
 # or
 Figure.save(eon)
 ```
-### Result:
+
+#### Result:
+
 ![Network figure](/results/network.png)
 
-# Simulating
+### Simulating
+
 ```python
 print('\nOriginal EON simulation')
 eon.resetSpectrum()
@@ -98,19 +134,23 @@ demands = Simulation.createRandomDemands(eon, random_state=10)
 demands = Simulation.simulateDemands(eon, demands)
 print(Report.fromDemands(demands))
 ```
-## Result
+
+#### Result
+
 ```python
 Original EON simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}
 ```
 
-# Getting all possible networks with new links
+### Getting all possible networks with new links
+
 ```python
 #                                                                Capacity Cost
 possible_eons = Simulation.getPossibleEonsWithNewLinks(eon, 50, 1, n_links=1, max_length=report['diameter_by_length'] / 2)
 ```
 
-## Simulating them
+### Simulating them
+
 ```python
 i = 0
 for possible_eon in possible_eons:
@@ -121,7 +161,9 @@ for possible_eon in possible_eons:
     demands = Simulation.simulateDemands(possible_eon, demands)
     print(Report.fromDemands(demands))
 ```
-### Results
+
+#### Results
+
 ```python
 EON 0 simulation
 {'successes': 28, 'blocks': 17, 'blocks_by_modulation': 0, 'blocks_by_spectrum': 17, 'block_rate': 0.37777777777777777, 'success_rate': 0.6222222222222222}

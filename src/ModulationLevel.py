@@ -9,16 +9,17 @@ class ModulationLevel:
         self.spectral_efficiency = spectral_efficiency
     
     def __repr__(self):
-        return self.name
+        return '<%s>'%self.name
 
     def __str__(self):
-        return self.name
+        return '<%s>'%self.name
 
 def loadModulationLevels(modulation_levels_csv):
     ml_df = read_csv(modulation_levels_csv)
     
     modulation_levels = []
-    for index, ml in ml_df.iterrows():
+    for ml in ml_df.iterrows():
+        ml = ml[1]
         modulation_levels.append(ModulationLevel(ml['name'], ml['data_rate'], ml['power_consumption'], ml['reach'], ml['spectral_efficiency']))
     
     return modulation_levels
