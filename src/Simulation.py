@@ -1,7 +1,7 @@
 import networkx as nx
 from haversine import haversine
 from copy import deepcopy
-from itertools import combinations
+from itertools import combinations, permutations
 import random as randoom
 import numpy.random as random
 from math import ceil
@@ -22,21 +22,37 @@ def getPossibleNewLinks(eon, max_length=None, n_links=1):
     
     return combinations(links, n_links)
 
-def getPossibleEonsWithNewLinks(eon, capacity, cost, max_length=None, n_links=1, k_edge_connected=None, possible_links=None):
+def getPossibleCycleLinks(eon, max_length=None):
+    coord = nx.get_node_attributes(eon, 'coord')
+    nodes = list(eon.nodes)
+    for cycle in permutations(nodes[1:], len(nodes[1:])):
+        ignore_cycle = False
+        cycle = nodes[0:1] + list(cycle) + nodes[0:1]
+        links = []
+        for i in range(len(cycle)-1):
+            link = (cycle[i], cycle[i+1])
+            length = haversine(coord[link[0]], coord[link[1]])
+            if max_length is None or length <= max_length:
+                links.append((link[0], link[1], length))
+            else:
+                ignore_cycle = True
+                break
+        if not ignore_cycle:
+            yield links
+
+def getPossibleEONsWithNewLinks(eon, max_length=None, n_links=1, k_edge_connected=None, possible_links=None):
     if possible_links is None:
         possible_links = getPossibleNewLinks(eon, max_length, n_links)
     
-    count = 0
     for links in possible_links:
         H = deepcopy(eon)
         for link in links:
-            H.addLink(link[0], link[1], link[2], capacity, cost)
+            H.addLink(link[0], link[1], link[2])
         if k_edge_connected is None or nx.is_k_edge_connected(H, k_edge_connected):
-            H.name = '#%d EON + %d links'%(count, n_links)
+            H.name = 'EON with %d links'%len(H.edges())
             H.resetSpectrum()
             H.initializeRoutes()
             yield H
-        count += 1
 
 # # # # # # # # # #
 # Demand section  #

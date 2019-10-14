@@ -29,32 +29,6 @@ def byLength(eon):
         'eccentricity_by_length': ecc_by_length,
     }
 
-def byCapacity(eon):
-    ecc_by_capacity = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='capacity')))
-    capacities = list(nx.get_edge_attributes(eon, 'capacity').values())
-    return {
-        'min_capacity': min(capacities),
-        'max_capacity': max(capacities),
-        'radius_by_capacity': nx.radius(eon, e=ecc_by_capacity),
-        'diameter_by_capacity': nx.diameter(eon, e=ecc_by_capacity),
-        'center_by_capacity': nx.center(eon, e=ecc_by_capacity),
-        'periphery_by_capacity': nx.periphery(eon, e=ecc_by_capacity),
-        'eccentricity_by_capacity': ecc_by_capacity,
-    }
-
-def byCost(eon):
-    ecc_by_cost = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='cost')))
-    costs = list(nx.get_edge_attributes(eon, 'cost').values())
-    return {
-        'min_cost': min(costs),
-        'max_cost': max(costs),
-        'radius_by_cost': nx.radius(eon, e=ecc_by_cost),
-        'diameter_by_cost': nx.diameter(eon, e=ecc_by_cost),
-        'center_by_cost': nx.center(eon, e=ecc_by_cost),
-        'periphery_by_cost': nx.periphery(eon, e=ecc_by_cost),
-        'eccentricity_by_cost': ecc_by_cost,
-    }
-
 def fromDemands(demands):
     total_data_rate = 0
     unexecuted = 0
@@ -81,7 +55,7 @@ def fromDemands(demands):
     }
 
 def full(eon, demands=[]):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(demands)}
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **fromDemands(demands)}
 
 def show(report):
     print('network report\n')

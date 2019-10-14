@@ -31,10 +31,10 @@ Figure.draw(eon)
 Figure.save(folder='results/')
 
 # Simulating possible EONs with new links
-possible_eons = Simulation.getPossibleEonsWithNewLinks(eon, 50, 1, max_length=report['diameter_by_length'] / 2, n_links=1, k_edge_connected=2)
+possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, max_length=report['diameter_by_length'] / 2, n_links=1, k_edge_connected=2)
 count = 0
 for possible_eon in possible_eons:
-    print('\nSimulating', possible_eon)
+    print('\n%dth simulation:'%(count+1), possible_eon)
     Simulation.simulateDemands(possible_eon, modulation_levels, demands)
     print(Report.fromDemands(demands))
     # Saving figure
