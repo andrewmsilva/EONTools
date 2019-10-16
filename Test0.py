@@ -30,6 +30,9 @@ print(Report.fromDemands(demands))
 Figure.draw(eon)
 Figure.save(folder='results/')
 
+# Testing csv
+Report.writeCSV(eon)
+
 # Simulating possible EONs with new links
 possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, max_length=report['diameter_by_length'] / 2, n_links=1, k_edge_connected=2)
 count = 0
@@ -40,4 +43,6 @@ for possible_eon in possible_eons:
     # Saving figure
     Figure.draw(possible_eon)
     Figure.save(folder='results/', name='network%d'%count)
+    # Add to CSV file
+    Report.writeCSV(possible_eon)
     count += 1
