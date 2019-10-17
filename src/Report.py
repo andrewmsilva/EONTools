@@ -3,6 +3,8 @@ import json
 import csv
 
 def writeCSV(eon, demands):
+    index = ['density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
+
     try:
         numRows = 0
         with open('results/results.csv', 'r') as file:
@@ -17,23 +19,31 @@ def writeCSV(eon, demands):
 
     except:
         with open('results/results.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-            index = ['density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
-            writer.writerow(index)
+            writer = csv.DictWriter(file, fieldnames=index)
+            writer.writeheader()
         file.close()
 
     finally:
         with open('results/results.csv', 'a', newline='') as file:
-            writer = csv.writer(file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-            row = [minimal(eon)['density'], byLeaps(eon)['radius_by_leaps'], byLeaps(eon)['diameter_by_leaps'], byLength(eon)['min_length'], byLength(eon)['max_length'], byLength(eon)['radius_by_length'], byLength(eon)['diameter_by_length'], fromDemands(demands)['total_data_rate'], fromDemands(demands)['unexecuted'], fromDemands(demands)['successes'], fromDemands(demands)['blocks'], fromDemands(demands)['unexecuted_rate'], fromDemands(demands)['success_rate'], fromDemands(demands)['block_rate']]
-            writer.writerow(row)
+            writer = csv.DictWriter(file, fieldnames=index)
+            writer.writerow(CSVdata(eon, demands))
         file.close()
 
-    # with open('results.csv', 'w', newline='') as file:
-    #     index = ['density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
-    #     writer = csv.DictWriter(file, fieldnames=index)
-    #     writer.writeheader()
-    # file.close()
+        
+def CSVdata(eon, demands):
+    lengths = list(nx.get_edge_attributes(eon, 'length').values())
+    ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
+
+    return {
+        'density': nx.density(eon),
+        'radius_by_leaps': nx.radius(eon),
+        'diameter_by_leaps': nx.diameter(eon),
+        'min_length': min(lengths),
+        'max_length': max(lengths),
+        'radius_by_length': nx.radius(eon, e=ecc_by_length),
+        'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
+        **fromDemands(demands)
+    }
 
 
 def minimal(eon):
