@@ -1,13 +1,14 @@
 import networkx as nx
+from statistics import mean, variance
 import json
 import csv
 
-def writeCSV(eon, demands):
-    index = ['density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
-
+def writeCSV(eon, demands, name='simulations', folder=''):
+    index = ['mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
+    results_csv = folder + name + '.csv'
     try:
         numRows = 0
-        with open('results/results.csv', 'r') as file:
+        with open(results_csv, 'r') as file:
             fileReader = csv.reader(file, delimiter=' ', quotechar='|')
             for row in fileReader:
                 if row[0] not in (None, ""):
@@ -18,13 +19,13 @@ def writeCSV(eon, demands):
             raise IndexError
 
     except:
-        with open('results/results.csv', 'w', newline='') as file:
+        with open(results_csv, 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=index)
             writer.writeheader()
         file.close()
 
     finally:
-        with open('results/results.csv', 'a', newline='') as file:
+        with open(results_csv, 'a', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=index)
             writer.writerow(CSVdata(eon, demands))
         file.close()
@@ -33,8 +34,11 @@ def writeCSV(eon, demands):
 def CSVdata(eon, demands):
     lengths = list(nx.get_edge_attributes(eon, 'length').values())
     ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
+    degrees = nx.degree(eon)
 
     return {
+        'mean_degree': meanDegree(eon, degrees=degrees),
+        'degree_variance': degreeVariance(eon, degrees=degrees),
         'density': nx.density(eon),
         'radius_by_leaps': nx.radius(eon),
         'diameter_by_leaps': nx.diameter(eon),
@@ -45,11 +49,25 @@ def CSVdata(eon, demands):
         **fromDemands(demands)
     }
 
+def meanDegree(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return mean(degrees)
+
+def degreeVariance(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return variance(degrees)
 
 def minimal(eon):
+    degrees = nx.degree(eon)
     return {
-        'degree': nx.degree(eon),
-        'density': nx.density(eon),
+        'degree': degrees,
+        'mean_degree': meanDegree(eon, degrees=degrees),
+        'degree_variance': degreeVariance(eon, degrees=degrees),
+        'density': nx.density(eon)
     }
 
 def byLeaps(eon):

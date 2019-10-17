@@ -18,11 +18,8 @@ for demand in demands:
 # Simulating all possible surviving EONs
 n = len(eon.nodes())
 full = int(n*(n-1)/2)
-count = 0
 for n_links in range(n, full+1):
   possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
   for possible_eon in possible_eons:
-    count += 1
-    print('\n%dth simulation:'%count, possible_eon)
     Simulation.simulateDemands(possible_eon, modulation_levels, demands)
-    print(Report.fromDemands(demands))
+    Report.writeCSV(possible_eon, demands, name='test1', folder='results/')
