@@ -1,5 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 
 def draw(eon):
     # Clearing figure buffer

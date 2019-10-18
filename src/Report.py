@@ -1,10 +1,73 @@
 import networkx as nx
+from statistics import mean, variance
 import json
+import csv
+
+def writeCSV(eon, demands, name='simulations', folder=''):
+    index = ['mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
+    results_csv = folder + name + '.csv'
+    try:
+        numRows = 0
+        with open(results_csv, 'r') as file:
+            fileReader = csv.reader(file, delimiter=' ', quotechar='|')
+            for row in fileReader:
+                if row[0] not in (None, ""):
+                    numRows += 1
+        file.close()
+
+        if numRows==0:
+            raise IndexError
+
+    except:
+        with open(results_csv, 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=index)
+            writer.writeheader()
+        file.close()
+
+    finally:
+        with open(results_csv, 'a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=index)
+            writer.writerow(CSVdata(eon, demands))
+        file.close()
+
+        
+def CSVdata(eon, demands):
+    lengths = list(nx.get_edge_attributes(eon, 'length').values())
+    ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
+    degrees = nx.degree(eon)
+
+    return {
+        'mean_degree': meanDegree(eon, degrees=degrees),
+        'degree_variance': degreeVariance(eon, degrees=degrees),
+        'density': nx.density(eon),
+        'radius_by_leaps': nx.radius(eon),
+        'diameter_by_leaps': nx.diameter(eon),
+        'min_length': min(lengths),
+        'max_length': max(lengths),
+        'radius_by_length': nx.radius(eon, e=ecc_by_length),
+        'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
+        **fromDemands(demands)
+    }
+
+def meanDegree(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return mean(degrees)
+
+def degreeVariance(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return variance(degrees)
 
 def minimal(eon):
+    degrees = nx.degree(eon)
     return {
-        'degree': nx.degree(eon),
-        'density': nx.density(eon),
+        'degree': degrees,
+        'mean_degree': meanDegree(eon, degrees=degrees),
+        'degree_variance': degreeVariance(eon, degrees=degrees),
+        'density': nx.density(eon)
     }
 
 def byLeaps(eon):
@@ -27,32 +90,6 @@ def byLength(eon):
         'center_by_length': nx.center(eon, e=ecc_by_length),
         'periphery_by_length': nx.periphery(eon, e=ecc_by_length),
         'eccentricity_by_length': ecc_by_length,
-    }
-
-def byCapacity(eon):
-    ecc_by_capacity = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='capacity')))
-    capacities = list(nx.get_edge_attributes(eon, 'capacity').values())
-    return {
-        'min_capacity': min(capacities),
-        'max_capacity': max(capacities),
-        'radius_by_capacity': nx.radius(eon, e=ecc_by_capacity),
-        'diameter_by_capacity': nx.diameter(eon, e=ecc_by_capacity),
-        'center_by_capacity': nx.center(eon, e=ecc_by_capacity),
-        'periphery_by_capacity': nx.periphery(eon, e=ecc_by_capacity),
-        'eccentricity_by_capacity': ecc_by_capacity,
-    }
-
-def byCost(eon):
-    ecc_by_cost = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='cost')))
-    costs = list(nx.get_edge_attributes(eon, 'cost').values())
-    return {
-        'min_cost': min(costs),
-        'max_cost': max(costs),
-        'radius_by_cost': nx.radius(eon, e=ecc_by_cost),
-        'diameter_by_cost': nx.diameter(eon, e=ecc_by_cost),
-        'center_by_cost': nx.center(eon, e=ecc_by_cost),
-        'periphery_by_cost': nx.periphery(eon, e=ecc_by_cost),
-        'eccentricity_by_cost': ecc_by_cost,
     }
 
 def fromDemands(demands):
@@ -81,7 +118,7 @@ def fromDemands(demands):
     }
 
 def full(eon, demands=[]):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **byCapacity(eon), **byCost(eon), **fromDemands(demands)}
+    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **fromDemands(demands)}
 
 def show(report):
     print('network report\n')

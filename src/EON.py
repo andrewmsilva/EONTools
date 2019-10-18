@@ -4,6 +4,10 @@ from haversine import haversine
 from itertools import islice
 
 class EON(nx.Graph):
+    # # # # # # # # # # #
+    # Building section  #
+    # # # # # # # # # # #
+
     def __init__(self, frequency_slots=320, name='EON', k_paths=3):
         nx.Graph.__init__(self)
 
@@ -19,23 +23,10 @@ class EON(nx.Graph):
     
     def __str__(self):
         return '<%s>'%self.name
-        
-    def addNode(self, id, lat, lon, type):
-        nx.Graph.add_node(self, id, lat=lat, lon=lon, type=type, coord=(lat, lon))
-    
-    def addLink(self, source, target, length, capacity, cost):
-        if length is None:
-            coord = nx.get_node_attributes(self, 'coord')
-            length = haversine(coord[source], coord[target])
-        
-        nx.Graph.add_edge(self, source, target, length=length, capacity=capacity, cost=cost)
-        # Building the link spectrum
-        link = (source, target)
-        self.spectrum[link] = [None]*self.frequency_slots
     
     def loadCSV(self, nodes_csv, links_csv, 
                 node_id='id', node_lat='lat', node_lon='long', node_type='type', 
-                link_from='from', link_to='to', link_length='length', link_capacity='capacity', link_cost='cost'):
+                link_source='from', link_target='to', link_length='length'):
         # Loading nodes
         if nodes_csv is not None:
             nodes = read_csv(nodes_csv, encoding="ISO-8859-1")
@@ -46,11 +37,45 @@ class EON(nx.Graph):
         # Loading links
         if links_csv is not None:
             links = read_csv(links_csv, encoding="ISO-8859-1")
-            links.columns = [link_from, link_to, link_length, link_capacity, link_cost] + list(nodes.columns)[5:]
+            links.columns = [link_source, link_target, link_length] + list(links.columns)[3:]
             for link in links.iterrows():
                 link = link[1]
-                self.addLink(link[link_from], link[link_to], link[link_length], link[link_capacity], link[link_cost])
+                self.addLink(link[link_source], link[link_target], link[link_length])
     
+    # # # # # # # # #
+    # Nodes section #
+    # # # # # # # # #
+    
+    def addNode(self, id, lat, lon, type):
+        nx.Graph.add_node(self, id, lat=lat, lon=lon, type=type, coord=(lat, lon))
+    
+    # # # # # # # # #
+    # Links section #
+    # # # # # # # # #
+    
+    def addLink(self, source, target, length=None):
+        if length is None:
+            coord = nx.get_node_attributes(self, 'coord')
+            length = haversine(coord[source], coord[target])
+        
+        nx.Graph.add_edge(self, source, target, length=length)
+        self.spectrum[(source, target)] = [None]*self.frequency_slots
+    
+    def removeLink(self, source, target):
+        nx.Graph.remove_edge(self, source, target)
+        try:
+            del self.spectrum[(source, target)]
+        except:
+            del self.spectrum[(target, source)]
+    
+    def removeAllLinks(self):
+        for link in self.edges:
+            self.removeLink(link[0], link[1])
+    
+    # # # # # # # # # # # # # # # # #
+    # Spectrum and routing section  #
+    # # # # # # # # # # # # # # # # #
+
     def resetSpectrum(self):
         for link in self.spectrum.keys():
             self.spectrum[link] = [None]*self.frequency_slots
