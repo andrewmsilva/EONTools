@@ -24,7 +24,7 @@ Simulation.simulateDemands(eon, modulation_levels, demands)
 Report.writeCSV(eon, demands, name='test0', folder='results/')
 
 # Saving figure
-Figure.draw(eon)
+Figure.drawEON(eon)
 Figure.save(folder='results/')
 
 # Simulating possible EONs with new links
@@ -34,7 +34,7 @@ for possible_eon in possible_eons:
   Simulation.simulateDemands(possible_eon, modulation_levels, demands)
   Report.writeCSV(possible_eon, demands, name='test0', folder='results/')
   # Saving figure
-  Figure.draw(possible_eon)
+  Figure.drawEON(possible_eon)
   Figure.save(folder='results/', name='network%d'%count)
   # Add to CSV file
   count += 1
