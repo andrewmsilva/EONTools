@@ -5,10 +5,11 @@
 ### Python libraries
 
 ```bash
-$ pip install pandas
-$ pip install matplotlib
-$ pip install networkx
-$ pip install haversine
+$ pip3 install pandas
+$ pip3 install matplotlib
+$ pip3 install networkx
+$ pip3 install haversine
+$ pip3 install seaborn
 ```
 
 ## Using

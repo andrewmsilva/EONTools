@@ -1,12 +1,15 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import seaborn as sns
+
 import warnings
 warnings.filterwarnings("ignore")
 
-def draw(eon):
-    # Clearing figure buffer
+def clearBuffer():
     plt.cla()
     plt.close()
+
+def drawEON(eon):
     # Drawing nodes
     nodes_coord = nx.get_node_attributes(eon, 'coord')
     data_rate = eon.spectrum.copy()
@@ -22,6 +25,23 @@ def draw(eon):
         except:
             labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=3)
+
+def heatmap(corr):
+    # Creating figure
+    ax = sns.heatmap(
+        corr, 
+        vmin=-1, vmax=1, center=0,
+        cmap=sns.diverging_palette(20, 220, n=200),
+        square=True
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        rotation=45,
+        horizontalalignment='right'
+    )
+
+def bar(corr):
+   ax = sns.barplot(x=corr.values, y=corr.index)
 
 def plot():
     plt.show()
