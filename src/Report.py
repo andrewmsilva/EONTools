@@ -4,7 +4,7 @@ import json
 import csv
 
 def writeCSV(eon, demands, name='simulations', folder=''):
-    index = ['mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'unexecuted', 'successes', 'blocks', 'unexecuted_rate', 'success_rate', 'block_rate']
+    index = ['mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
     results_csv = folder + name + '.csv'
     try:
         numRows = 0
@@ -36,6 +36,8 @@ def CSVdata(eon, demands):
     ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     degrees = nx.degree(eon)
 
+    demands_report = fromDemands(demands)
+
     return {
         'mean_degree': meanDegree(eon, degrees=degrees),
         'degree_variance': degreeVariance(eon, degrees=degrees),
@@ -46,7 +48,8 @@ def CSVdata(eon, demands):
         'max_length': max(lengths),
         'radius_by_length': nx.radius(eon, e=ecc_by_length),
         'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
-        **fromDemands(demands)
+        'total_data_rate': demands_report['total_data_rate'], 
+        'block_rate': demands_report['block_rate']
     }
 
 def meanDegree(eon, degrees=None):
