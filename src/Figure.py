@@ -26,13 +26,17 @@ def drawEON(eon):
             labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=3)
 
+def formatLabels(data_frame):
+    data_frame.columns = [column.replace("_", " ").title() for column in data_frame.columns]
+
 def heatmap(corr):
     # Creating figure
     ax = sns.heatmap(
-        corr, 
-        vmin=-1, vmax=1, center=0,
-        cmap=sns.diverging_palette(20, 220, n=200),
-        square=True
+        corr,
+        center=0,
+        cmap=sns.diverging_palette(220, 20, n=200),
+        square=True,
+        annot=True,
     )
     ax.set_xticklabels(
         ax.get_xticklabels(),
@@ -41,7 +45,10 @@ def heatmap(corr):
     )
 
 def bar(corr):
-   ax = sns.barplot(x=corr.values, y=corr.index)
+    ax = sns.barplot(
+        x=corr.values, 
+        y=corr.index, 
+    )
 
 def plot():
     plt.show()
