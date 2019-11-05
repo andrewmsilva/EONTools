@@ -63,6 +63,8 @@ class Demand():
         self.source = source
         self.target = target
         self.data_rate = data_rate
+        self.links_path = None
+        self.path_length = None
         self.modulation_level = None
         self.frequency_slots = None
         self.spectrum_begin = None
@@ -75,6 +77,8 @@ class Demand():
         return '<%s to %s: %d GBps>'%(self.source, self.target, self.data_rate)
 
     def reset(self):
+        self.links_path = None
+        self.path_length = None
         self.modulation_level = None
         self.frequency_slots = None
         self.spectrum_begin = None
@@ -84,53 +88,71 @@ class Demand():
 # RMLSA section #
 # # # # # # # # #
 
-def RMLSA(eon, modulation_levels, demand):
-    # Calculating shortest paths if necessary
+def route(eon, demand, k=0):
+    # Creating routes if necessary
     if eon.shortest_path is None:
         eon.initializeRoutes()
-    for k in range(len(eon.shortest_path[demand.source][demand.target])):
-        # Reseting demand
-        demand.reset()
-        # Routing
-        demand.path = eon.shortest_path[demand.source][demand.target][k]
-        # Allocating modulation level
-        path_length = eon.shortest_path_length[demand.source][demand.target][k]
-        demand.modulation_level = None
-        for ml in modulation_levels:
-            if path_length <= ml.reach:
-                if demand.modulation_level is None:
-                    demand.modulation_level = ml
-                elif ml.data_rate > demand.modulation_level.data_rate:
-                    demand.modulation_level = ml
-        if demand.modulation_level is None:
-            demand.status = False
-            continue
-        # Allocating spectrum
-        demand.frequency_slots = ceil(demand.data_rate / demand.modulation_level.data_rate)
-        for i in range(eon.frequency_slots):
-            if demand.spectrum_begin is not None and i-demand.spectrum_begin == demand.frequency_slots:
-                break
-            available = True
-            for j in range(len(demand.path)-1):
-                try:
-                    if eon.spectrum[(demand.path[j], demand.path[j+1])][i] is not None:
-                        available = False
-                except:
-                    if eon.spectrum[(demand.path[j+1], demand.path[j])][i] is not None:
-                        available = False
-            if available:
-                if demand.spectrum_begin is None:
-                    demand.spectrum_begin = i
-            else:
-                demand.spectrum_begin = None
-        if i-demand.spectrum_begin == demand.frequency_slots:
-            demand.status = True
-            return
+    # Blocking demand if there are no more routes
+    if k >= len(eon.shortest_path[demand.source][demand.target]):
+        demand.status = False
+        return
+    # Getting route
+    nodes_path = eon.shortest_path[demand.source][demand.target][k]
+    path_length = eon.shortest_path_length[demand.source][demand.target][k]
+    # Creating links path
+    links_path = []
+    for i in range(len(nodes_path)-1):
+        link = (nodes_path[i], nodes_path[i+1])
+        if link not in eon.edges():
+            link = (link[1], link[0])
+            if link not in eon.edges():
+                demand.status = False
+                return
+        links_path.append(link)
+    demand.links_path = links_path
+    demand.path_length = path_length
+
+def allocModulationLevel(eon, demand, modulation_levels):
+    if demand.status is not None:
+        return
+    demand.modulation_level = None
+    for ml in modulation_levels:
+        if demand.path_length <= ml.reach:
+            if demand.modulation_level is None:
+                demand.modulation_level = ml
+            elif ml.data_rate > demand.modulation_level.data_rate:
+                demand.modulation_level = ml
+    if demand.modulation_level is None:
+        demand.status = False
+
+def allocSpectrum(eon, demand):
+    if demand.status is not None:
+        return
+    demand.frequency_slots = ceil(demand.data_rate / demand.modulation_level.data_rate)
+    for i in range(eon.frequency_slots):
+        if demand.spectrum_begin is not None and i-demand.spectrum_begin == demand.frequency_slots:
+            break
+        available = True
+        for link in demand.links_path:
+            if eon.edges[link[0], link[1]]['spectrum'][i] is not None:
+                available = False
+        if available:
+            if demand.spectrum_begin is None:
+                demand.spectrum_begin = i
         else:
             demand.spectrum_begin = None
-            demand.status = False
+    if i-demand.spectrum_begin == demand.frequency_slots:
+        demand.status = True
     else:
+        demand.spectrum_begin = None
         demand.status = False
+
+def RMLSA(eon, modulation_levels, demand):
+    for k in range(eon.k_paths):
+        demand.reset()
+        route(eon, demand, k=k)
+        allocModulationLevel(eon, demand, modulation_levels)
+        allocSpectrum(eon, demand)
 
 # # # # # # # # # # # #
 # Simulation section  #
@@ -139,14 +161,10 @@ def RMLSA(eon, modulation_levels, demand):
 def executeDemand(eon, demand):
     if demand.status is True:
         for i in range(demand.spectrum_begin, demand.spectrum_begin + demand.frequency_slots):
-            for j in range(len(demand.path)-1):
-                try:
-                    eon.spectrum[(demand.path[j], demand.path[j+1])][i] = demand.modulation_level.data_rate
-                except:
-                    eon.spectrum[(demand.path[j+1], demand.path[j])][i] = demand.modulation_level.data_rate
+            for link in demand.links_path:
+                eon.edges[link[0], link[1]]['spectrum'][i] = demand.modulation_level.data_rate
 
 def simulateDemand(eon, modulation_levels, demand):
-    demand.reset()
     RMLSA(eon, modulation_levels, demand)
     executeDemand(eon, demand)
 

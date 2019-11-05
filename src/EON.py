@@ -58,8 +58,7 @@ class EON(nx.Graph):
             coord = nx.get_node_attributes(self, 'coord')
             length = haversine(coord[source], coord[target])
         
-        nx.Graph.add_edge(self, source, target, length=length)
-        self.spectrum[(source, target)] = [None]*self.frequency_slots
+        nx.Graph.add_edge(self, source, target, length=length, spectrum=[None]*self.frequency_slots)
     
     def removeLink(self, source, target):
         nx.Graph.remove_edge(self, source, target)
@@ -77,8 +76,9 @@ class EON(nx.Graph):
     # # # # # # # # # # # # # # # # #
 
     def resetSpectrum(self):
-        for link in self.spectrum.keys():
-            self.spectrum[link] = [None]*self.frequency_slots
+        links = list(self.edges())
+        for link in links:
+            self.edges[link[0], link[1]]['spectrum'] = [None]*self.frequency_slots
     
     def createKShortestPaths(self, source, target):
         if source not in self.shortest_path.keys():
@@ -88,7 +88,6 @@ class EON(nx.Graph):
             self.shortest_path[source][target] = list(islice(nx.shortest_simple_paths(self, source, target, weight='length'), self.k_paths))
         except nx.exception.NetworkXNoPath:
             self.shortest_path[source][target] = []
-        #print(self.shortest_path[source][target])
         self.shortest_path_length[source][target] = []
         # Calculating lengths
         for path in self.shortest_path[source][target]:

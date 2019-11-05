@@ -1,13 +1,13 @@
 import networkx as nx
-import matplotlib.pyplot as plt
+from matplotlib.pyplot import *
 import seaborn as sns
 
 import warnings
 warnings.filterwarnings("ignore")
 
 def clearBuffer():
-    plt.cla()
-    plt.close()
+    cla()
+    close()
 
 def drawEON(eon):
     # Drawing nodes
@@ -15,7 +15,7 @@ def drawEON(eon):
     data_rate = eon.spectrum.copy()
     for link in data_rate.keys():
         data_rate[link] = sum(filter(None, data_rate[link]))
-    nx.draw(eon, nodes_coord, with_labels=True, font_size=4, node_size=50, edge_color=list(data_rate.values()), edge_cmap=plt.cm.cool) 
+    nx.draw(eon, nodes_coord, with_labels=True, font_size=4, node_size=50, edge_color=list(data_rate.values()), edge_cmap=cm.cool) 
     # Drawing length of each link
     labels = nx.get_edge_attributes(eon, 'length')
     for link in labels.keys():
@@ -26,13 +26,19 @@ def drawEON(eon):
             labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=3)
 
-def heatmap(corr):
+def formatLabels(data_frame):
+    data_frame.columns = [column.replace("_", " ").title() for column in data_frame.columns]
+
+def heatmap(corr, ax=None):
     # Creating figure
     ax = sns.heatmap(
-        corr, 
-        vmin=-1, vmax=1, center=0,
-        cmap=sns.diverging_palette(20, 220, n=200),
-        square=True
+        corr,
+        center=0,
+        cmap=sns.diverging_palette(220, 20, n=200),
+        cbar=False,
+        square=True,
+        annot=True,
+        ax=ax
     )
     ax.set_xticklabels(
         ax.get_xticklabels(),
@@ -40,11 +46,17 @@ def heatmap(corr):
         horizontalalignment='right'
     )
 
-def bar(corr):
-   ax = sns.barplot(x=corr.values, y=corr.index)
-
-def plot():
-    plt.show()
+def bar(corr, ax=None):
+    ax = sns.barplot(
+        x=corr.index, 
+        y=corr.values, 
+        ax=ax,
+    )
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        rotation=45,
+        horizontalalignment='right'
+    )
 
 def save(folder='', name='network'):
-    plt.savefig(folder + name + '.png', format='png', dpi=600)
+    savefig(folder + name + '.png', format='png', dpi=600)
