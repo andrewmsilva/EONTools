@@ -6,7 +6,7 @@ from EONTools import Figure
 all_files = glob('results/*.csv')
 simulations = []
 for filename in all_files:
-    df = read_csv(filename, index_col=None, header=0)
+    df = read_csv(filename)
     simulations.append(df)
 simulations = concat(simulations, axis=0, ignore_index=True)
 
@@ -16,12 +16,13 @@ print(simulations.describe())
 # Calculating correlations
 corr = simulations.corr()
 
-# Plotting heatmap
-Figure.clearBuffer()
-Figure.heatmap(corr)
-Figure.plot()
+# Plotting
+fig, ax = Figure.subplots(1, 2)
 
-# Plotting barplot
-Figure.clearBuffer()
-Figure.bar(corr['Block Rate'])
-Figure.plot()
+ax[0].set_title('Correlation matrix')
+Figure.heatmap(corr, ax[0])
+
+ax[1].set_title('Correlation by Block Rate')
+Figure.bar(corr['Block Rate'], ax[1])
+
+Figure.show()

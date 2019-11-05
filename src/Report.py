@@ -3,11 +3,12 @@ from statistics import mean, variance
 import json
 import csv
 
-def writeCSV(eon, demands, name='simulations', folder=''):
-    index = ['mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
-    results_csv = folder + name + '.csv'
+index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
+
+def getIdOrCreateCSV(csv_name, folder=''):
+    results_csv = folder + csv_name + '.csv'
+    numRows = 0
     try:
-        numRows = 0
         with open(results_csv, 'r') as file:
             fileReader = csv.reader(file, delimiter=' ', quotechar='|')
             for row in fileReader:
@@ -17,28 +18,33 @@ def writeCSV(eon, demands, name='simulations', folder=''):
 
         if numRows==0:
             raise IndexError
-
     except:
         with open(results_csv, 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=index)
             writer.writeheader()
+            numRows += 1
         file.close()
+    return numRows-1
 
-    finally:
-        with open(results_csv, 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=index)
-            writer.writerow(CSVdata(eon, demands))
-        file.close()
-
+def writeCSV(eon, demands, csv_name, id=None, folder=''):
+    with open(results_csv, 'a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=index)
+        writer.writerow(CSVdata(eon, demands, id=id))
+    file.close()
         
-def CSVdata(eon, demands):
+def CSVdata(eon, demands, id=None):
     lengths = list(nx.get_edge_attributes(eon, 'length').values())
-    ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     degrees = nx.degree(eon)
-
     demands_report = fromDemands(demands)
 
+    ecc_by_length = 0
+    try:
+        ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
+    except:
+        pass
+
     return {
+        '': id,
         'mean_degree': meanDegree(eon, degrees=degrees),
         'degree_variance': degreeVariance(eon, degrees=degrees),
         'density': nx.density(eon),
@@ -50,49 +56,6 @@ def CSVdata(eon, demands):
         'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
         'total_data_rate': demands_report['total_data_rate'], 
         'block_rate': demands_report['block_rate']
-    }
-
-def meanDegree(eon, degrees=None):
-    if degrees is None:
-        degrees = nx.degree(eon)
-    degrees = [d[1] for d in degrees]
-    return mean(degrees)
-
-def degreeVariance(eon, degrees=None):
-    if degrees is None:
-        degrees = nx.degree(eon)
-    degrees = [d[1] for d in degrees]
-    return variance(degrees)
-
-def minimal(eon):
-    degrees = nx.degree(eon)
-    return {
-        'degree': degrees,
-        'mean_degree': meanDegree(eon, degrees=degrees),
-        'degree_variance': degreeVariance(eon, degrees=degrees),
-        'density': nx.density(eon)
-    }
-
-def byLeaps(eon):
-    return {
-        'radius_by_leaps': nx.radius(eon),
-        'diameter_by_leaps': nx.diameter(eon),
-        'center_by_leaps': nx.center(eon),
-        'periphery_by_leaps': nx.periphery(eon),
-        'eccentricity_by_leaps': nx.eccentricity(eon),
-    }
-
-def byLength(eon):
-    lengths = list(nx.get_edge_attributes(eon, 'length').values())
-    ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
-    return {
-        'min_length': min(lengths),
-        'max_length': max(lengths),
-        'radius_by_length': nx.radius(eon, e=ecc_by_length),
-        'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
-        'center_by_length': nx.center(eon, e=ecc_by_length),
-        'periphery_by_length': nx.periphery(eon, e=ecc_by_length),
-        'eccentricity_by_length': ecc_by_length,
     }
 
 def fromDemands(demands):
@@ -119,20 +82,3 @@ def fromDemands(demands):
         'success_rate': successes / n_demands  if n_demands > 0 else None,
         'block_rate': blocks / n_demands if n_demands > 0 else None,
     }
-
-def full(eon, demands=[]):
-    return {**minimal(eon), **byLeaps(eon), **byLength(eon), **fromDemands(demands)}
-
-def show(report):
-    print('network report\n')
-    for key, value in report.items():
-        print(key, ':', value)
-
-def save(report, folder=''):
-    if 'degree' in report.keys():
-        report['degree'] = list(report['degree'])
-    report_json = json.dumps(report)
-    # Create results folder if does not exists
-    f = open(folder + "network_report.json","w")
-    f.write(report_json)
-    f.close()

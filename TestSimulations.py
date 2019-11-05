@@ -12,12 +12,18 @@ def simulate(links_list, modulation_levels):
     demands = Simulation.createRandomDemands(eon, random_state=0)
 
     csv_name = '%d-%d'%(links_list[0], links_list[-1])
+    folder = 'results/'
+
+    id = Report.getIdOrCreateCSV(csv_name, folder=folder)
+    count = 0
     print('Simulating all possbile EONs with', csv_name, 'links')
     for n_links in links_list:
         possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
         for possible_eon in possible_eons:
-            Simulation.simulateDemands(possible_eon, modulation_levels, demands)
-            Report.writeCSV(possible_eon, demands, name=csv_name, folder='results/')
+            if count >= id:
+                Simulation.simulateDemands(possible_eon, modulation_levels, demands)
+                Report.writeCSV(possible_eon, demands, csv_name, id=count, folder=folder)
+            count += 1
 
 # Loading EON
 nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
