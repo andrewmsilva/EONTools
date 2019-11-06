@@ -59,7 +59,7 @@ def CSVdata(eon, demands, id=None):
         'block_rate': demands_report['block_rate']
     }
 
-    if ecc_by_length is None
+    if ecc_by_length is None:
         data['radius_by_length'] = 0
         data['diameter_by_length'] = 0
 
