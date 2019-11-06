@@ -38,13 +38,13 @@ def CSVdata(eon, demands, id=None):
     degrees = nx.degree(eon)
     demands_report = fromDemands(demands)
 
-    ecc_by_length = 0
+    ecc_by_length = None
     try:
         ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     except:
         pass
 
-    return {
+    data = {
         '': id,
         'mean_degree': meanDegree(eon, degrees=degrees),
         'degree_variance': degreeVariance(eon, degrees=degrees),
@@ -58,6 +58,12 @@ def CSVdata(eon, demands, id=None):
         'total_data_rate': demands_report['total_data_rate'], 
         'block_rate': demands_report['block_rate']
     }
+
+    if ecc_by_length is None
+        data['radius_by_length'] = 0
+        data['diameter_by_length'] = 0
+
+    return data
 
 def fromDemands(demands):
     total_data_rate = 0
