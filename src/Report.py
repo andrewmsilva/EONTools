@@ -27,6 +27,7 @@ def getIdOrCreateCSV(csv_name, folder=''):
     return numRows-1
 
 def writeCSV(eon, demands, csv_name, id=None, folder=''):
+    results_csv = folder + csv_name + '.csv'
     with open(results_csv, 'a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=index)
         writer.writerow(CSVdata(eon, demands, id=id))
