@@ -21,8 +21,11 @@ def simulate(links_list, modulation_levels):
         possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
         for possible_eon in possible_eons:
             if count >= id:
-                Simulation.simulateDemands(possible_eon, modulation_levels, demands)
-                Report.writeCSV(possible_eon, demands, csv_name, id=count, folder=folder)
+                try:
+                    Simulation.simulateDemands(possible_eon, modulation_levels, demands)
+                    Report.writeCSV(possible_eon, demands, csv_name, id=count, folder=folder)
+                except Exception as e:
+                    print(e)
             count += 1
 
 # Loading EON
