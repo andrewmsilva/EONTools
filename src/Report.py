@@ -5,6 +5,18 @@ import csv
 
 index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
 
+def meanDegree(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return mean(degrees)
+
+def degreeVariance(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return variance(degrees)
+
 def getIdOrCreateCSV(csv_name, folder=''):
     results_csv = folder + csv_name + '.csv'
     numRows = 0

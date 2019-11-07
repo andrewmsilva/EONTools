@@ -1,9 +1,12 @@
 import networkx as nx
 from matplotlib.pyplot import *
+import numpy as np
 import seaborn as sns
 
 import warnings
 warnings.filterwarnings("ignore")
+
+palette = sns.diverging_palette(220, 20, n=200)
 
 def clearBuffer():
     cla()
@@ -34,7 +37,7 @@ def heatmap(corr, ax=None):
     ax = sns.heatmap(
         corr,
         center=0,
-        cmap=sns.diverging_palette(220, 20, n=200),
+        cmap=palette,
         cbar=False,
         square=True,
         annot=True,
@@ -48,8 +51,9 @@ def heatmap(corr, ax=None):
 
 def bar(corr, ax=None):
     ax = sns.barplot(
-        x=corr.index, 
-        y=corr.values, 
+        x=corr.index,
+        y=corr.values,
+        palette=palette,
         ax=ax,
     )
     ax.set_xticklabels(
