@@ -29,16 +29,11 @@ def drawEON(eon):
             labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=3)
 
-def formatLabels(data_frame):
-    data_frame.columns = [column.replace("_", " ").title() for column in data_frame.columns]
-
 def heatmap(corr, ax=None):
-    # Creating figure
     ax = sns.heatmap(
         corr,
         center=0,
         cmap=palette,
-        cbar=False,
         square=True,
         annot=True,
         ax=ax
@@ -48,6 +43,7 @@ def heatmap(corr, ax=None):
         rotation=45,
         horizontalalignment='right'
     )
+    return ax
 
 def bar(corr, ax=None):
     ax = sns.barplot(
@@ -61,6 +57,7 @@ def bar(corr, ax=None):
         rotation=45,
         horizontalalignment='right'
     )
+    return ax
 
 def save(folder='', name='network'):
     savefig(folder + name + '.png', format='png', dpi=600)
