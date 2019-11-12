@@ -1,9 +1,12 @@
 import networkx as nx
 from matplotlib.pyplot import *
+import numpy as np
 import seaborn as sns
 
 import warnings
 warnings.filterwarnings("ignore")
+
+palette = sns.diverging_palette(220, 20, n=200)
 
 def clearBuffer():
     cla()
@@ -26,16 +29,11 @@ def drawEON(eon):
             labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
     nx.draw_networkx_edge_labels(eon, nodes_coord, edge_labels=labels, font_size=3)
 
-def formatLabels(data_frame):
-    data_frame.columns = [column.replace("_", " ").title() for column in data_frame.columns]
-
 def heatmap(corr, ax=None):
-    # Creating figure
     ax = sns.heatmap(
         corr,
         center=0,
-        cmap=sns.diverging_palette(220, 20, n=200),
-        cbar=False,
+        cmap=palette,
         square=True,
         annot=True,
         ax=ax
@@ -45,11 +43,13 @@ def heatmap(corr, ax=None):
         rotation=45,
         horizontalalignment='right'
     )
+    return ax
 
 def bar(corr, ax=None):
     ax = sns.barplot(
-        x=corr.index, 
-        y=corr.values, 
+        x=corr.index,
+        y=corr.values,
+        palette=palette,
         ax=ax,
     )
     ax.set_xticklabels(
@@ -57,6 +57,7 @@ def bar(corr, ax=None):
         rotation=45,
         horizontalalignment='right'
     )
+    return ax
 
 def save(folder='', name='network'):
     savefig(folder + name + '.png', format='png', dpi=600)

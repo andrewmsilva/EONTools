@@ -5,6 +5,18 @@ import csv
 
 index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
 
+def meanDegree(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return mean(degrees)
+
+def degreeVariance(eon, degrees=None):
+    if degrees is None:
+        degrees = nx.degree(eon)
+    degrees = [d[1] for d in degrees]
+    return variance(degrees)
+
 def getIdOrCreateCSV(csv_name, folder=''):
     results_csv = folder + csv_name + '.csv'
     numRows = 0
@@ -27,6 +39,7 @@ def getIdOrCreateCSV(csv_name, folder=''):
     return numRows-1
 
 def writeCSV(eon, demands, csv_name, id=None, folder=''):
+    results_csv = folder + csv_name + '.csv'
     with open(results_csv, 'a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=index)
         writer.writerow(CSVdata(eon, demands, id=id))
@@ -37,13 +50,13 @@ def CSVdata(eon, demands, id=None):
     degrees = nx.degree(eon)
     demands_report = fromDemands(demands)
 
-    ecc_by_length = 0
+    ecc_by_length = None
     try:
         ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
     except:
         pass
 
-    return {
+    data = {
         '': id,
         'mean_degree': meanDegree(eon, degrees=degrees),
         'degree_variance': degreeVariance(eon, degrees=degrees),
@@ -57,6 +70,12 @@ def CSVdata(eon, demands, id=None):
         'total_data_rate': demands_report['total_data_rate'], 
         'block_rate': demands_report['block_rate']
     }
+
+    if ecc_by_length is None:
+        data['radius_by_length'] = 0
+        data['diameter_by_length'] = 0
+
+    return data
 
 def fromDemands(demands):
     total_data_rate = 0
