@@ -39,43 +39,40 @@ def getIdOrCreateCSV(csv_name, folder=''):
     return numRows-1
 
 def writeCSV(eon, demands, csv_name, id=None, folder=''):
-    results_csv = folder + csv_name + '.csv'
-    with open(results_csv, 'a', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=index)
-        writer.writerow(CSVdata(eon, demands, id=id))
-    file.close()
+    data = CSVdata(eon, demands, id=id)
+
+    if data is not None:
+        results_csv = folder + csv_name + '.csv'
+        with open(results_csv, 'a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=index)
+            writer.writerow(data)
+        file.close()
         
 def CSVdata(eon, demands, id=None):
-    lengths = list(nx.get_edge_attributes(eon, 'length').values())
-    degrees = nx.degree(eon)
-    demands_report = fromDemands(demands)
-
-    ecc_by_length = None
     try:
+        lengths = list(nx.get_edge_attributes(eon, 'length').values())
+        degrees = nx.degree(eon)
+        demands_report = fromDemands(demands)
         ecc_by_length = nx.eccentricity(eon, sp=dict(nx.all_pairs_dijkstra_path_length(eon, weight='length')))
+
+        data = {
+            '': id,
+            'mean_degree': meanDegree(eon, degrees=degrees),
+            'degree_variance': degreeVariance(eon, degrees=degrees),
+            'density': nx.density(eon),
+            'radius_by_leaps': nx.radius(eon),
+            'diameter_by_leaps': nx.diameter(eon),
+            'min_length': min(lengths),
+            'max_length': max(lengths),
+            'radius_by_length': nx.radius(eon, e=ecc_by_length),
+            'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
+            'total_data_rate': demands_report['total_data_rate'], 
+            'block_rate': demands_report['block_rate']
+        }
+
+        return data
     except:
-        pass
-
-    data = {
-        '': id,
-        'mean_degree': meanDegree(eon, degrees=degrees),
-        'degree_variance': degreeVariance(eon, degrees=degrees),
-        'density': nx.density(eon),
-        'radius_by_leaps': nx.radius(eon),
-        'diameter_by_leaps': nx.diameter(eon),
-        'min_length': min(lengths),
-        'max_length': max(lengths),
-        'radius_by_length': nx.radius(eon, e=ecc_by_length),
-        'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
-        'total_data_rate': demands_report['total_data_rate'], 
-        'block_rate': demands_report['block_rate']
-    }
-
-    if ecc_by_length is None:
-        data['radius_by_length'] = 0
-        data['diameter_by_length'] = 0
-
-    return data
+        return None
 
 def fromDemands(demands):
     total_data_rate = 0
