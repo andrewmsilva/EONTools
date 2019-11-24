@@ -3,7 +3,7 @@ from statistics import mean, variance
 import json
 import csv
 
-index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_leaps', 'diameter_by_leaps', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'block_rate']
+index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_hops', 'diameter_by_hops', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'blocking_coefficient']
 
 def meanDegree(eon, degrees=None):
     if degrees is None:
@@ -60,14 +60,14 @@ def CSVdata(eon, demands, id=None):
             'mean_degree': meanDegree(eon, degrees=degrees),
             'degree_variance': degreeVariance(eon, degrees=degrees),
             'density': nx.density(eon),
-            'radius_by_leaps': nx.radius(eon),
-            'diameter_by_leaps': nx.diameter(eon),
+            'radius_by_hops': nx.radius(eon),
+            'diameter_by_hops': nx.diameter(eon),
             'min_length': min(lengths),
             'max_length': max(lengths),
             'radius_by_length': nx.radius(eon, e=ecc_by_length),
             'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
             'total_data_rate': demands_report['total_data_rate'], 
-            'block_rate': demands_report['block_rate']
+            'blocking_coefficient': demands_report['blocking_coefficient']
         }
 
         return data
@@ -96,5 +96,5 @@ def fromDemands(demands):
         'blocks': blocks,
         'unexecuted_rate': unexecuted / n_demands if n_demands > 0 else None,
         'success_rate': successes / n_demands  if n_demands > 0 else None,
-        'block_rate': blocks / n_demands if n_demands > 0 else None,
+        'blocking_coefficient': blocks / n_demands if n_demands > 0 else None,
     }

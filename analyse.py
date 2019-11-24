@@ -14,8 +14,13 @@ simulations = concat(simulations)
 simulations.columns = [column.replace("_", " ").title() for column in simulations.columns]
 print(simulations.describe())
 
+# Casting columns
+for i in range(len(simulations.columns)):
+  if simulations.dtypes[i] != 'float64' or simulations.dtypes[i] != 'int64':
+    simulations[simulations.columns[i]] = simulations[simulations.columns[i]].astype(float)
+
 # Calculating correlations
-corr = simulations.corr()
+corr = simulations.corr(min_periods=8)
 print(corr)
 
 # Plotting results
@@ -23,6 +28,6 @@ ax = Figure.heatmap(corr)
 ax.set_title('Correlation matrix')
 Figure.show()
 
-ax = Figure.bar(corr['Block Rate'])
-ax.set_title('Correlation by Block Coefficient')
+ax = Figure.bar(corr['Blocking Coefficient'])
+ax.set_title('Correlation by Blocking Coefficient')
 Figure.show()

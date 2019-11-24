@@ -1,5 +1,5 @@
 import networkx as nx
-from matplotlib.pyplot import *
+from matplotlib.pyplot import cla, close, savefig, cm, plot, show
 import numpy as np
 import seaborn as sns
 

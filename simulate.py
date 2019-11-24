@@ -2,23 +2,25 @@ from EONTools import *
 from threading import Thread
 
 # Simulation method
-def simulate(links_list, modulation_levels):
+def simulate(links_list, modulation_levels, thread_id):
+    thread_id += 1
+    print('Thread %d: starting'%thread_id)
     # Loading EON
     nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
     eon = EON(name='EON without links')
     eon.loadCSV(nodes_csv, None)
 
     # Creating random demands
-    demands = Simulation.createRandomDemands(eon, random_state=0)
+    demands = Demand.createRandomDemands(eon, random_state=0)
 
     csv_name = '%d-%d'%(links_list[0], links_list[-1])
     folder = 'results/'
 
     id = Report.getIdOrCreateCSV(csv_name, folder=folder)
     count = 0
-    print('Simulating all possbile EONs with', csv_name, 'links')
+    print('Thread %d: simulating %s'%(thread_id, csv_name))
     for n_links in links_list:
-        possible_eons = Simulation.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
+        possible_eons = Combinations.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
         for possible_eon in possible_eons:
             if count >= id:
                 Simulation.simulateDemands(possible_eon, modulation_levels, demands)
@@ -29,6 +31,9 @@ def simulate(links_list, modulation_levels):
 nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
 eon = EON(name='EON without links')
 eon.loadCSV(nodes_csv, None)
+
+# Getting modulation levels
+modulation_levels = ModulationLevel.loadModulationLevels('input/modulation_levels.csv')
 
 # Calculating and generating list of new links
 n = len(eon.nodes())
@@ -46,11 +51,8 @@ while last < len(n_list):
     last += avg
 n_list = aux
 
-# Getting modulation levels
-modulation_levels = loadModulationLevels('input/modulation_levels.csv')
-
 # Starting threads
 threads = [None]*n_threads
 for i in range(0, n_threads):
-    threads[i] = Thread(target=simulate, args=(n_list[i], modulation_levels))
+    threads[i] = Thread(target=simulate, args=(n_list[i], modulation_levels, i))
     threads[i].start()
