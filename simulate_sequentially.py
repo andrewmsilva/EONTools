@@ -18,7 +18,7 @@ lock = Lock()
 def simulate(modulation_levels, thread_id):
     # Loading dependencies
     global n, full, lock
-    # Getting number of links
+    # Getting number of links (mutex)
     n_links = None
     lock.acquire()
     if n <= full:

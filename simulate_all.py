@@ -3,7 +3,6 @@ from threading import Thread
 
 # Simulation method
 def simulate(links_list, modulation_levels, thread_id):
-    thread_id += 1
     print('Thread %d: starting'%thread_id)
     # Loading EON
     nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
@@ -18,8 +17,8 @@ def simulate(links_list, modulation_levels, thread_id):
 
     id = Report.getIdOrCreateCSV(csv_name, folder=folder)
     count = 0
-    print('Thread %d: simulating %s'%(thread_id, csv_name))
     for n_links in links_list:
+        print('Thread %d: simulating EONs with %d links'%(thread_id, n_links))
         possible_eons = Combinations.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
         for possible_eon in possible_eons:
             if count >= id:

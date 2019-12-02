@@ -2,6 +2,7 @@ import networkx as nx
 from pandas import read_csv
 from haversine import haversine
 from itertools import islice
+from matplotlib.pyplot import cm
 
 class EON(nx.Graph):
     # # # # # # # # # # #
@@ -13,7 +14,6 @@ class EON(nx.Graph):
 
         self.name = name
         self.frequency_slots = frequency_slots
-        self.spectrum = {}
         self.k_paths = k_paths
         self.shortest_path = None
         self.shortest_path_length = None
@@ -42,6 +42,23 @@ class EON(nx.Graph):
                 link = link[1]
                 self.addLink(link[link_source], link[link_target], link[link_length])
     
+    def createFigure(self):
+        # Drawing nodes
+        nodes_coord = nx.get_node_attributes(self, 'coord')
+        data_rate = nx.get_edge_attributes(self, 'spectrum')
+        for link in data_rate.keys():
+            data_rate[link] = sum(filter(None, data_rate[link]))
+        nx.draw(self, nodes_coord, with_labels=True, font_size=10, node_size=100, edge_color=list(data_rate.values()), edge_cmap=cm.cool) 
+        # Drawing length of each link
+        labels = nx.get_edge_attributes(self, 'length')
+        for link in labels.keys():
+            labels[link] = '%d Km'%round(labels[link])
+            try:
+                labels[link] += '\n%d GBps'%data_rate[link]
+            except:
+                labels[link] += '\n%d GBps'%data_rate[(link[1], link[0])]
+        nx.draw_networkx_edge_labels(self, nodes_coord, edge_labels=labels, font_size=8)
+
     # # # # # # # # #
     # Nodes section #
     # # # # # # # # #
@@ -59,17 +76,6 @@ class EON(nx.Graph):
             length = haversine(coord[source], coord[target])
         
         nx.Graph.add_edge(self, source, target, length=length, spectrum=[None]*self.frequency_slots)
-    
-    def removeLink(self, source, target):
-        nx.Graph.remove_edge(self, source, target)
-        try:
-            del self.spectrum[(source, target)]
-        except:
-            del self.spectrum[(target, source)]
-    
-    def removeAllLinks(self):
-        for link in self.edges:
-            self.removeLink(link[0], link[1])
     
     # # # # # # # # # # # # # # # # #
     # Spectrum and routing section  #
