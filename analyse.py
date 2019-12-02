@@ -3,7 +3,7 @@ from glob import glob
 from EONTools import Figure
 
 # Loading simulations
-all_files = glob('results/*.csv')
+all_files = glob('results/simulate_all/*.csv')
 simulations = []
 for filename in all_files:
     df = read_csv(filename, index_col=0)
@@ -31,3 +31,6 @@ Figure.show()
 ax = Figure.bar(corr['Blocking Coefficient'])
 ax.set_title('Correlation by Blocking Coefficient')
 Figure.show()
+
+# Figure.sns.pairplot(simulations, palette=Figure.palette)
+# Figure.show()

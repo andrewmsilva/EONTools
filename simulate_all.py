@@ -14,7 +14,7 @@ def simulate(links_list, modulation_levels, thread_id):
     demands = Demand.createRandomDemands(eon, random_state=0)
 
     csv_name = '%d-%d'%(links_list[0], links_list[-1])
-    folder = 'results/'
+    folder = 'results/simulate_all/'
 
     id = Report.getIdOrCreateCSV(csv_name, folder=folder)
     count = 0
