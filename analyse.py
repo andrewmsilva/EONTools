@@ -4,7 +4,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Loading simulations
-all_files = glob('results/simulate_all/*.csv')
+simulate_all = 'results/simulate_all/*.csv'
+simulate_sequentially = 'results/simulate_sequentially/*.csv'
+all_files = glob(simulate_sequentially)
 simulations = []
 for filename in all_files:
     df = read_csv(filename, index_col=0)
