@@ -40,15 +40,15 @@ def simulate(modulation_levels, thread_id):
     id = Report.getIdOrCreateCSV(csv_name, folder=folder)
 
     count = 0
-    print('Thread %d.%d: simulating'%(thread_id, n_links))
+    print('Thread %d: simulating for %d links'%(thread_id, n_links))
     possible_eons = Combinations.getPossibleEONsWithNewLinks(eon, n_links=n_links, k_edge_connected=2)
     for possible_eon in possible_eons:
         if count >= id:
             Simulation.simulateDemands(possible_eon, modulation_levels, demands)
             Report.writeCSV(possible_eon, demands, csv_name, id=count, folder=folder)
         count += 1
-    print('Thread %d.%d: done'%(thread_id, n_links))
     simulate(modulation_levels, thread_id)
+    print('Thread %d: finished'%thread_id)
 
 # Starting threads
 n_threads = 8

@@ -25,6 +25,7 @@ def simulate(links_list, modulation_levels, thread_id):
                 Simulation.simulateDemands(possible_eon, modulation_levels, demands)
                 Report.writeCSV(possible_eon, demands, csv_name, id=count, folder=folder)
             count += 1
+    print('Thread %d: finished'%thread_id)
 
 # Loading EON
 nodes_csv = 'input/rnp/rnpBrazil_nodes.csv'
