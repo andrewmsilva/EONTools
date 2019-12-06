@@ -3,7 +3,7 @@ from statistics import mean, variance
 import json
 import csv
 
-index = ['', 'mean_degree', 'degree_variance', 'density', 'radius_by_hops', 'diameter_by_hops', 'min_length', 'max_length', 'radius_by_length', 'diameter_by_length', 'total_data_rate', 'blocking_coefficient']
+index = ['', 'Average degree', 'Degree variance', 'Density', 'Transitivity', 'Node connectivity', 'Edge connectivity', 'Cycle basis', 'Estrada index', 'Average clustering by hops', 'Average clustering by length', 'Wiener index by hops', 'Wiener index by length', 'Radius by hops', 'Radius by length', 'Diameter by hops', 'Diameter by length', 'Min length', 'Max length', 'Blocking coefficient']
 
 def meanDegree(eon, degrees=None):
     if degrees is None:
@@ -57,17 +57,25 @@ def CSVdata(eon, demands, id=None):
 
         data = {
             '': id,
-            'mean_degree': meanDegree(eon, degrees=degrees),
-            'degree_variance': degreeVariance(eon, degrees=degrees),
-            'density': nx.density(eon),
-            'radius_by_hops': nx.radius(eon),
-            'diameter_by_hops': nx.diameter(eon),
-            'min_length': min(lengths),
-            'max_length': max(lengths),
-            'radius_by_length': nx.radius(eon, e=ecc_by_length),
-            'diameter_by_length': nx.diameter(eon, e=ecc_by_length),
-            'total_data_rate': demands_report['total_data_rate'], 
-            'blocking_coefficient': demands_report['blocking_coefficient']
+            'Average degree': meanDegree(eon, degrees=degrees),
+            'Degree variance': degreeVariance(eon, degrees=degrees),
+            'Density': nx.density(eon),
+            'Transitivity': nx.transitivity(eon),
+            'Node connectivity': nx.node_connectivity(eon),
+            'Edge connectivity': nx.edge_connectivity(eon),
+            'Cycle basis': len(nx.cycle_basis(eon)),
+            'Estrada index': nx.estrada_index(eon),
+            'Average clustering by hops': nx.average_clustering(eon),
+            'Average clustering by length': nx.average_clustering(eon, weight='length'),
+            'Wiener index by hops': nx.wiener_index(eon),
+            'Wiener index by length': nx.wiener_index(eon, weight='length'),
+            'Radius by hops': nx.radius(eon),
+            'Radius by length': nx.radius(eon, e=ecc_by_length),
+            'Diameter by hops': nx.diameter(eon),
+            'Diameter by length': nx.diameter(eon, e=ecc_by_length),
+            'Min length': min(lengths),
+            'Max length': max(lengths),
+            'Blocking coefficient': demands_report['blocking_coefficient']
         }
 
         return data

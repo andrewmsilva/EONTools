@@ -33,7 +33,7 @@ def getPossibleCycleLinks(eon, max_length=None):
         if not ignore_cycle:
             yield links
 
-def getPossibleEONsWithNewLinks(eon, max_length=None, n_links=1, k_edge_connected=None, possible_links=None):
+def getPossibleEONsWithNewLinks(eon, max_length=None, n_links=1, min_connectivity=None, max_connectivity=None, possible_links=None):
     if possible_links is None:
         possible_links = getPossibleNewLinks(eon, max_length, n_links)
     
@@ -41,7 +41,8 @@ def getPossibleEONsWithNewLinks(eon, max_length=None, n_links=1, k_edge_connecte
         H = deepcopy(eon)
         for link in links:
             H.addLink(link[0], link[1], link[2])
-        if k_edge_connected is None or nx.is_k_edge_connected(H, k_edge_connected):
+        connectivity = nx.edge_connectivity(H)
+        if (min_connectivity is None or connectivity >= min_connectivity) and (max_connectivity is None or connectivity <= max_connectivity):
             H.name = 'EON with %d links'%len(H.edges())
             H.resetSpectrum()
             H.initializeRoutes()
